@@ -1,0 +1,43 @@
+﻿@using HRMWebApp.Helper
+@{ 
+    ViewBag.Title = "Lỗi xác thực";
+    Layout = "~/Views/Shared/_LayoutBlank.cshtml";
+
+    string sAction = "";
+    if (Session[GlobalConstants.SESSION_KEY_ADMINISTRATION] != null)
+    {
+        sAction = "Index";
+    }
+    else if (Session[GlobalConstants.SESSION_KEY_USER] != null)
+    {
+        sAction = "User";
+    }
+    else if (Session[GlobalConstants.SESSION_KEY_MEMBER] != null)
+    {
+        sAction = "Member";
+    }
+}
+<div class="row">
+    <div class="col-lg-5 col-sm-7 col-xs-11 col-lg-offset-4 col-sm-offset-3 col-xs-offset-1">
+        <div class="error-container">
+            <h1 class="error-code text-warning">STOP</h1>
+            <p class="error-info">
+                Bạn không được phép truy cập chức năng này
+            </p>
+            @if (!String.IsNullOrEmpty(sAction))
+            {
+                <p class="error-help mb">
+                    Please go to <a href="@Url.Action(sAction, "Home")" class="btn btn-transparent">@Language.Dashboard</a>
+                </p>
+            }
+            else
+            {
+                <p class="error-help mb">
+                    Please click to <a href="@Url.Action("Login","Account")" class="btn btn-transparent">@Language.Login</a>
+                </p>
+            }
+                    
+
+        </div>
+    </div>
+</div>

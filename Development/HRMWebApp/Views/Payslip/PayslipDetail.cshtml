@@ -1,0 +1,54 @@
+﻿@{
+    ViewBag.Title = "Bảng lương chi tiết";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<SelectListItem> listMonth = ViewBag.listMonth;
+    List<SelectListItem> listYear = ViewBag.listYear;
+    List<SelectListItem> listUser = ViewBag.listUser;
+}
+<section class="list-widget widget">
+    <header>
+        <h4>BẢNG LƯƠNG CHI TIẾT</h4>
+    </header>
+    <div class="body">
+        <div class="form-horizontal">
+            <div class="row form-group">
+                <div class="col-xs-4 col-sm-4 col-md-2 col-lg-2">
+                    <div class="input-group-btn">
+                        @Html.DropDownList("ddlMonth", new SelectList(listMonth, "Value", "Text", DateTime.Now.Month.ToString()), new { @class = "form-control select2" })
+                        @Html.DropDownList("ddlYear", new SelectList(listYear, "Value", "Text", DateTime.Now.Year.ToString()), new { @class = "form-control select2" })
+                    </div>
+                </div>
+                @Html.Label("Nhân viên: ", new { @class = "control-label col-xs-2 col-sm-2 col-md-2 col-lg-2", @style = "padding-top:6px;" })
+                <div class="col-xs-6 col-sm-6 col-md-4 col-lg-4 margin-bottom">
+                        @Html.DropDownList("ddlUser", new SelectList(listUser, "Value", "Text", ""), new { @class = "form-control select2" })
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <button type="button" id="btn-filter" class="btn btn-success" style="width:110px;"><i class="fa fa-filter"></i> Lọc</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts{
+    <script src="/Content/lib/select2/select2.min.js"></script>
+    <script>
+        $(function () {
+            function pageLoad() {
+                $("#ddlMonth").select2({
+                    templateResult: function (d) { return $(d.text); },
+                    templateSelection: function (d) { return $(d.text); },
+                });
+                $("#ddlYear").select2({
+                    templateResult: function (d) { return $(d.text); },
+                    templateSelection: function (d) { return $(d.text); },
+                });
+                $("#ddlUser").select2({
+                    templateResult: function (d) { return $(d.text); },
+                    templateSelection: function (d) { return $(d.text); },
+                });
+            }
+            pageLoad();
+            PjaxApp.onPageLoad(pageLoad);
+        });
+    </script>
+}

@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "Trang chủ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="list-widget widget">
+    <header>
+        <h4></h4>
+    </header>
+    <div class="body">
+        <div class="form-horizontal">
+            <div class="row form-group">
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts{
+    <script>
+        $(function () {
+            function pageLoad() {
+            }
+            pageLoad();
+            PjaxApp.onPageLoad(pageLoad);
+        });
+    </script>
+}
