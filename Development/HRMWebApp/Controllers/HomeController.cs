@@ -47,7 +47,7 @@ namespace HRMWebApp.Controllers
             }
             else
             {
-                DataTable dtb = SqlConnect.GetData("SELECT Username, FullName, Password, Salt FROM Users WHERE UPPER(Username) = UPPER(N'" + username + "')");
+                DataTable dtb = SqlConnect.GetData("SELECT Username, CompanyID, EmployeeName, Password, Salt FROM Users WHERE UPPER(Username) = UPPER(N'" + username + "')");
 
                 if (dtb.Rows.Count > 0)
                 {
@@ -58,7 +58,7 @@ namespace HRMWebApp.Controllers
                     }
                     else
                     {
-                        InfoLogin _infoLogin = new InfoLogin() { UserName = dtb.Rows[0]["Username"].ToString(), FullName = dtb.Rows[0]["FullName"].ToString(), LoginTime = DateTime.Now };
+                        InfoLogin _infoLogin = new InfoLogin() { UserName = dtb.Rows[0]["Username"].ToString(), CompanyID = dtb.Rows[0]["CompanyID"].ToString(), EmployeeName = dtb.Rows[0]["EmployeeName"].ToString(), LoginTime = DateTime.Now };
                         Session[GlobalConstants.SESSION_KEY_USER] = _infoLogin;
                         return RedirectToAction("Index");
                     }

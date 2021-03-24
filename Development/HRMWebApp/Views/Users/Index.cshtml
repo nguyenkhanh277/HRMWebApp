@@ -1,0 +1,176 @@
+﻿@{
+    ViewBag.Title = "Danh sách nhân viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="list-widget widget">
+    <header>
+        <h4>Danh sách nhân viên</h4>
+    </header>
+    <div class="body">
+        <div class="row form-group">
+            <div class="col-xs-4 col-sm-4 col-md-2 col-lg-2">
+                <button type="button" id="btn-add" onclick="showForm('')" class="btn btn-primary"><i class="fa fa-plus"></i>Tạo mới</button>
+            </div>
+            <div class="col-xs-8 col-sm-8 col-md-10 col-lg-10">
+                <button type="button" id="btn-filter" class="btn btn-success"><i class="fa fa-filter"></i> Lọc</button>
+            </div>
+        </div>
+        <div class="box-body scrolls">
+            <table class="table table-bordered" id="data-list">
+                <thead>
+                    <tr>
+                        <th style="width:40px;" class="text-center no-sort">Xóa</th>
+                        <th style="width:40px;" class="text-center no-sort">Sửa</th>
+                        <th style="width: 10px" class="text-center">STT</th>
+                        <th style="min-width:100px; width:100px;" class="text-center">Tài khoản</th>
+                        <th style="min-width:100px; width:100px;" class="text-center">Mã NV</th>
+                        <th style="min-width:150px;" class="text-center">Tên nhân viên</th>
+                        <th style="min-width:100px; width:100px;" class="text-center no-sort">MST</th>
+                        <th style="min-width:100px; width:100px;" class="text-center no-sort">Chức vụ</th>
+                        <th style="min-width:100px; width:100px;" class="text-center no-sort">Phòng ban</th>
+                        <th style="min-width:100px; width:100px;" class="text-center no-sort">Ngày vào làm</th>
+                        <th style="min-width:100px; width:100px;" class="text-center no-sort">HT liên hệ</th>
+                        
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</section>
+@section Scripts{
+    <script src="/Content/lib/datatables/jquery.dataTables.min.js"></script>
+    <script src="/Content/lib/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="/Content/lib/datatables/jquery.slimscroll.min.js"></script>
+    <script src="/Content/lib/datatables/fastclick.js"></script>
+    <script>
+        var showForm = function (username) {
+            var url = '@Url.Action("UsersAddEdit", "Users")' + '?username=' + username;
+            showFastGlobalForm(url, (username == "" ? "Tạo mới nhân viên" : "Sửa nhân viên"));
+        };
+
+        var showFastGlobalForm = function (url, title) {
+            $("#modal-fast-create .modal-title ").text(title);
+            $("#modal-fast-create .modal-body").load(url, function () { });
+            $("#modal-fast-create").modal("show");
+        };
+
+        var remove = function (username) {
+            if (confirm("Bạn có chắc chắn muốn xóa không?")) {
+                $.ajax({
+                    cache: false,
+                    async: true,
+                    type: "POST",
+                    url: '@Url.Action("remove_users", "Users")',
+                    data: { username: username },
+                    success: function (data) {
+                        if (data.status) {
+                            loadList.ajax.reload(null, false);
+                        }
+                        alert(data.message);
+                    }
+                });
+            }
+        };
+
+        var loadList;
+        $(function () {
+            function pageLoad() {
+                $("#btn-filter").click(function (e) {
+                    loadList.ajax.reload(null, false);
+                });
+                loadList = $('#data-list').DataTable({
+                    ajax: {
+                        url: '@Url.Action("UsersList", "Users")',
+                        "data": function (d) {
+                            d.companyID = '';
+                        }
+                    },
+                    'paging': true,
+                    'lengthChange': false,
+                    'searching': true,
+                    'ordering': true,
+                    'info': true,
+                    'autoWidth': false
+                });
+
+
+//////// Modal
+                var _continue = false;
+                $("#btn-save-popup-continue").click(function (event) {
+                    _continue = true;
+                    $("#create-form-popup").trigger("submit");
+                });
+                $("#btn-save-popup").click(function (event) {
+                    _continue = false;
+                    $("#create-form-popup").trigger("submit");
+                });
+                $(".btn-close-popup").click(function (event) {
+                    $(this).find(".modal-body").html('');
+                    loadList.ajax.reload(null, false);
+                });
+
+                $('.modal').delegate("#create-form-popup", "submit", function (e) {
+                    $("#btn-save-popup-continue").prop('disabled', true);
+                    $("#btn-save-popup").prop('disabled', true);
+                    e.preventDefault();
+                    var formData = new FormData($(this)[0]);
+                    $.ajax({
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        dataType: 'json',
+                        type: "POST",
+                        url: $(this).attr('action'),
+                        data: formData,
+                        success: function (data) {
+                            if (data.status) {
+                                if (_continue) {
+                                    $('#Username').val('');
+                                    $('#STT').val('0');
+                                    $('#TenChucVu').val('');
+                                }
+                                else {
+                                    $('.btn-close-popup').click();
+                                    $(this).find(".modal-body").html('');
+                                }
+                                loadList.ajax.reload(null, false);
+                            }
+                            $("#btn-save-popup-continue").prop('disabled', false);
+                            $("#btn-save-popup").prop('disabled', false);
+                            alert(data.message);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Cập nhật thất bại.");
+                        }
+                    });
+                });
+//////// End Modal
+            }
+            pageLoad();
+            PjaxApp.onPageLoad(pageLoad);
+        });
+    </script>
+}
+
+<div id="modal-fast-create" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <div class="form-group">
+                    <button type="button" id="btn-save-popup-continue" class="btn btn-success"><i class="fa fa-save"></i> Lưu và tiếp tục</button>
+                    <button type="button" id="btn-save-popup" class="btn btn-success"><i class="fa fa-save"></i> Lưu lại</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-danger btn-close-popup"><i class="fa fa-close"></i> Đóng</button>
+                </div>
+            </div>
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>

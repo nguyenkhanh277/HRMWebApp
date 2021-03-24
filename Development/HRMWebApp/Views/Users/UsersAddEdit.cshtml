@@ -1,0 +1,91 @@
+﻿@{
+    string username = ViewBag.username;
+    string employeeCode = ViewBag.employeeCode;
+    string employeeName = ViewBag.employeeName;
+    string personalTaxCode = ViewBag.personalTaxCode;
+    string position = ViewBag.position;
+    string department = ViewBag.department;
+    string startDate = ViewBag.startDate;
+    string typeOfContact = ViewBag.typeOfContact;
+}
+
+@using (Html.BeginForm("add_edit_users", "Users", System.Web.Mvc.FormMethod.Post, new { enctype = "multipart/form-data", id = "create-form-popup", @class = "create-form-popup form-horizontal" }))
+{
+    <div class="panel panel-primary background-transparent" style="margin-bottom: 0px;">
+        <div class="panel-body">
+            <div class="form-group">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.AntiForgeryToken()
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-12 margin-bottom">
+                    @Html.Label("Tài khoản", new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @if (String.IsNullOrEmpty(username))
+                        {
+                            @Html.TextBox("Username", username, new { @class = "form-control input-transparent", placeholder = "Điền tài khoản" })
+                        }
+                        else
+                        {
+                            @Html.TextBox("Username", username, new { @class = "form-control input-transparent", placeholder = "Điền tài khoản", @readonly = "readonly" })
+                        }
+                    </div>
+                </div>
+                @if (String.IsNullOrEmpty(username))
+                {
+                    <div class="form-group col-sm-12 margin-bottom">
+                        @Html.Label("Mật khẩu", new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                                                
+                                @Html.TextBox("Password", "", new { @class = "form-control input-transparent", placeholder = "Điền mật khẩu" })
+                        </div>
+                    </div>
+                }
+                <div class="form-group col-sm-12 margin-bottom">
+                    @Html.Label("Mã nhân viên", new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.TextBox("EmployeeCode", employeeCode, new { @class = "form-control input-transparent", placeholder = "Điền mã nhân viên" })
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 margin-bottom">
+                    @Html.Label("Tên nhân viên", new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.TextBox("EmployeeName", employeeName, new { @class = "form-control input-transparent", placeholder = "Điền tên nhân viên" })
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 margin-bottom">
+                    @Html.Label("Mã số thuế", new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.TextBox("PersonalTaxCode", personalTaxCode, new { @class = "form-control input-transparent", placeholder = "Điền mã số thuế" })
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 margin-bottom">
+                    @Html.Label("Chức vụ", new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.TextBox("Position", position, new { @class = "form-control input-transparent", placeholder = "Điền chức vụ" })
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 margin-bottom">
+                    @Html.Label("Phòng ban", new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.TextBox("Department", department, new { @class = "form-control input-transparent", placeholder = "Điền phòng ban" })
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 margin-bottom">
+                    @Html.Label("Ngày bắt đầu", new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.TextBox("StartDate", String.IsNullOrEmpty(startDate) ? DateTime.Now.ToString("yyyy-MM-dd") : DateTime.Parse(startDate).ToString("yyyy-MM-dd"), new { @class = "form-control input-transparent", placeholder = "Điền ngày bắt đầu", type = "date" })
+                    </div>
+                </div>
+                <div class="form-group col-sm-12 margin-bottom">
+                    @Html.Label("Hình thức liên hệ", new { @class = "control-label col-md-4" })
+                    <div class="col-md-8">
+                        @Html.TextBox("TypeOfContact", typeOfContact, new { @class = "form-control input-transparent", placeholder = "Điền hình thức liên hệ" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script src="/Scripts/jquery.validate.min.js"></script>
+<script src="/Scripts/jquery.validate.unobtrusive.min.js"></script>

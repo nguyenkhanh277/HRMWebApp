@@ -4,7 +4,7 @@
     List<SelectListItem> listMonth = ViewBag.listMonth;
     List<SelectListItem> listYear = ViewBag.listYear;
 }
-@using (Html.BeginForm("UploadPayslip", "Payslip", System.Web.Mvc.FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-detail", @class = "create-form form-horizontal" }))
+@using (Html.BeginForm("UploadPayrolls", "Payrolls", System.Web.Mvc.FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-detail", @class = "create-form form-horizontal" }))
 {
     @Html.AntiForgeryToken()
     <section class="list-widget widget">
@@ -30,22 +30,57 @@
                         <button type="button" id="btn-upload" class="btn btn-warning"><i class="fa fa-upload"></i> Tải lên bảng lương</button>
                     </div>
                 </div>
-                <div class="box-body">
+                <div class="box-body scrolls">
                     <table class="table table-bordered" id="data-list">
+                        <colgroup>
+                            <col span="23">
+                            <col style="background-color:#fa501e;">
+                        </colgroup>
                         <thead>
                             <tr>
-                                <th style="width: 10px" class="text-center">STT</th>
-                                <th class="text-center">Họ và tên</th>
-                                <th style="width:150px;" class="text-center">Lương cứng</th>
-                                <th style="width:150px;" class="text-center">Phụ cấp</th>
-                                <th style="width:150px;" class="text-center">Thực lĩnh</th>
+                                <th rowspan="2" class="text-center" style="width: 10px">STT</th>
+                                <th rowspan="2" class="text-center" style="min-width:100px; width:100px;">Employee Code</th>
+                                <th rowspan="2" class="text-center" style="min-width:150px;">Employee Name</th>
+                                <th rowspan="2" class="text-center no-sort" style="min-width:100px; width:100px;">Actual Working Days</th>
+                                <th colspan="6" class="text-center no-sort" style="min-width:600px; width:100px;">Salary and Allowances</th>
+                                <th rowspan="2" class="text-center no-sortr" style="min-width:100px; width:100px;">Bonus Performance</th>
+                                <th rowspan="2" class="text-center no-sort" style="min-width:100px; width:100px;">Nontaxable Income</th>
+                                <th colspan="6" class="text-center no-sort" style="min-width:600px; width:100px;">Company Contribution</th>
+                                <th colspan="5" class="text-center no-sort" style="min-width:500px; width:100px;">Employees Contribution (Deduction)</th>
+                                <th rowspan="2" class="text-center no-sort" style="min-width:100px; width:100px; background-color:#fa501e !important;">Salary pay</th>
+                                @*<th rowspan="2" class="text-center" style="min-width:100px; width:100px;">Taxable income</th>
+                                <th colspan="4" class="text-center" style="min-width:400px; width:100px;">Employees Contribution (Deduction)</th>
+                                <th rowspan="2" class="text-center" style="min-width:100px; width:100px;">Income to calculate PIT payable</th>
+                                <th rowspan="2" class="text-center" style="min-width:100px; width:100px;">PIT Payable</th>
+                            </tr>*@
+                            <tr>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">Basic Salary</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">Housing Alowance</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">Transport Allowance</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">Mobile Allowance</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">Meal Allowance</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">Total Salary And Allowances</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">BHXH 17%</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">BHTNLĐ 0.5%</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">BHYT 3%</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">BHTN 1%</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">Total 21.5%</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">KPCĐ 2%</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">BHXH 8%</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">BHYT 1.5%</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">BHTN 1%</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">Total 10.5%</th>
+                                <th class="text-center no-sort" style="min-width:100px; width:100px;">PIT payable</th>
+                                @*<th class="text-center" style="min-width:100px; width:100px;">Personal deduction</th>
+                                <th class="text-center" style="min-width:100px; width:100px;">Number of Dependant</th>
+                                <th class="text-center" style="min-width:100px; width:100px;">Total deduction for Dependant</th>
+                                <th class="text-center" style="min-width:100px; width:100px;">Total Employee's deduction</th>*@
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
-            <div class="clearfix"></div>
         </div>
     </section>
 }
@@ -56,8 +91,8 @@
     <script src="/Content/lib/datatables/fastclick.js"></script>
     <script src="/Content/lib/select2/select2.min.js"></script>
     <script>
+        var loadList;
         $(function () {
-            var loadList;
             function pageLoad() {
                 $("#ddlMonth").select2({
                     templateResult: function (d) { return $(d.text); },
@@ -81,7 +116,7 @@
                 });
                 loadList = $('#data-list').DataTable({
                     ajax: {
-                        url: '@Url.Action("PayslipList", "Payslip")',
+                        url: '@Url.Action("PayrollsList", "Payrolls")',
                         "data": function (d) {
                             d.month = $("#ddlMonth").val();
                             d.year = $("#ddlYear").val();
@@ -125,7 +160,9 @@
                 });
 
                 $("#btn-upload").click(function (e) {
-                    $("#frm-detail").trigger("submit");
+                    if (confirm("Bạn có chắc chắn tải lên bảng lương của tháng " + $("#ddlMonth").val() + " năm " + $("#ddlYear").val() + " không?")) {
+                        $("#frm-detail").trigger("submit");
+                    }
                 });
             }
             pageLoad();

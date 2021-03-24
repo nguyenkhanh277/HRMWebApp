@@ -7,7 +7,8 @@ namespace HRMWebApp.Models
     public class InfoLogin
     {
         public String UserName { get; set; }
-        public String FullName { get; set; }
+        public String CompanyID { get; set; }
+        public String EmployeeName { get; set; }
         public DateTime LoginTime { get; set; }
 
         public static InfoLogin GetCurrentUser(HttpContext context)

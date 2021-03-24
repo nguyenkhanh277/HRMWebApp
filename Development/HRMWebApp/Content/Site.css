@@ -1676,7 +1676,8 @@ mark,
 }
 
 .text-center {
-    text-align: center;
+    text-align: center !important;
+    vertical-align: middle !important;
 }
 
 .text-justify {
@@ -1693,6 +1694,7 @@ mark,
 
 .text-uppercase, .initialism {
     text-transform: uppercase;
+    background-color: #0da3dd !important;
 }
 
 .text-capitalize {
@@ -7192,7 +7194,7 @@ button.close {
 }
 
 .modal-lg {
-    width: 97%;
+    width: 50%;
 }
 
 .tooltip {
@@ -14485,6 +14487,7 @@ textarea + .help-block,
     font-weight: 600;
     text-transform: uppercase;
     border-bottom-width: 1px;
+    background-color: #0da3dd !important;
 }
 
 .table td > .checkbox,
@@ -14507,6 +14510,7 @@ textarea + .help-block,
     font-weight: 600;
     text-transform: uppercase;
     border-bottom-width: 1px;
+    background-color: #0da3dd !important;
 }
 
 .table-lg > thead > tr > th,
@@ -21486,6 +21490,7 @@ svg .title {
 /***********************/
 .fc-grid th {
     text-transform: uppercase;
+    background-color: #0da3dd !important;
 }
 
 .fc-event {
@@ -25754,6 +25759,7 @@ table.table thead .sorting_desc_disabled {
 .users-list .name {
     margin: 0;
     text-transform: uppercase;
+    background-color: #0da3dd !important;
 }
 
     .news-list .name a,
@@ -26980,9 +26986,7 @@ div.tagsinput {
     color: RGB(250, 80, 30) !important;
 }
 
-/*@media (max-width: 768px) {
-    #datatable-table_wrapper {
-        width: 100%;
-        overflow-x: scroll;
-    }
-}*/
+.scrolls {
+    width: 100%;
+    overflow-x: scroll;
+}
