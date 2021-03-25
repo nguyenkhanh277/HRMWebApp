@@ -51,7 +51,7 @@ namespace HRMWebApp.Controllers
         }
 
         [UserAuthenticationFilter(AllUser: true), HttpPost]
-        public JsonResult add_edit_users()
+        public JsonResult UsersAddEdit()
         {
             bool status = false;
             string message = "Cập nhật thất bại.";
@@ -100,8 +100,8 @@ namespace HRMWebApp.Controllers
                             string password = SecurityHelper.GenerateMD5(rawPassword, salt);
                             string query = SqlConnect.InsertToTableString(
                                 "Users",
-                                new string[] { "Username", "CompanyID", "EmployeeCode", "EmployeeName", "PersonalTaxCode", "Position", "Department", "StartDate", "TypeOfContact" },
-                                new object[] { username, userInfo.CompanyID, employeeCode, employeeName, personalTaxCode, position, department, startDate, typeOfContact });
+                                new string[] { "Username", "CompanyID", "Salt", "Password", "EmployeeCode", "EmployeeName", "PersonalTaxCode", "Position", "Department", "StartDate", "TypeOfContact", "Status", "CreatedAt", "CreatedBy" },
+                                new object[] { username, userInfo.CompanyID, salt, password, employeeCode, employeeName, personalTaxCode, position, department, startDate, typeOfContact, 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), userInfo.Username });
 
                             SqlConnect.ExecuteQueryUsingTran(query);
                             if (!SqlConnect.Error)
@@ -125,19 +125,27 @@ namespace HRMWebApp.Controllers
         }
 
         [UserAuthenticationFilter(AllUser: true), HttpPost]
-        public JsonResult remove_users(string username)
+        public JsonResult RemoveUsers(string username)
         {
             bool status = false;
             string message = "Xóa thất bại";
-            if (!String.IsNullOrEmpty(username))
+            try
             {
-                SqlConnect.ExecuteQueryUsingTran("DELETE FROM Users WHERE Username = N'" + username + "'");
-                if (!SqlConnect.Error)
+                if (!String.IsNullOrEmpty(username))
                 {
-                    status = true;
-                    message = "Thành công.";
+                    string query = SqlConnect.DeleteFromTableString(
+                                        "Users",
+                                        " Username = N'" + username + "'"
+                                    );
+                    SqlConnect.ExecuteQueryUsingTran(query);
+                    if (!SqlConnect.Error)
+                    {
+                        status = true;
+                        message = "Thành công.";
+                    }
                 }
             }
+            catch { }
             return new JsonResult
             {
                 Data = new { status = status, message = message },
@@ -178,6 +186,69 @@ namespace HRMWebApp.Controllers
                 MaxJsonLength = Int32.MaxValue,
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
 
+            };
+        }
+
+        [UserAuthenticationFilter(AllUser: true), HttpPost]
+        public JsonResult ChangePassword(string oldPassword, string newPassword, string confirmPassword)
+        {
+            bool status = false;
+            string message = "Đổi mật khẩu thất bại";
+            try
+            {
+                if (String.IsNullOrEmpty(oldPassword))
+                {
+                    message = "Chưa điền mật khẩu cũ";
+                }
+                else if (String.IsNullOrEmpty(newPassword))
+                {
+                    message = "Chưa điền mật khẩu mới";
+                }
+                else if (String.IsNullOrEmpty(confirmPassword))
+                {
+                    message = "Chưa điền xác nhận mật khẩu";
+                }
+                else if (newPassword != confirmPassword)
+                {
+                    message = "Xác nhận mật khẩu không đúng";
+                }
+                else
+                {
+                    InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
+                    DataTable dtb = SqlConnect.GetData("SELECT Username, Password, Salt FROM Users WHERE UPPER(Username) = UPPER(N'" + userInfo.Username + "')");
+                    if (dtb.Rows.Count > 0)
+                    {
+                        String encryptedPassword = SecurityHelper.GenerateMD5(oldPassword, dtb.Rows[0]["Salt"].ToString());
+                        if (dtb.Rows[0]["Password"].ToString() != encryptedPassword)
+                        {
+                            message = "Mật khẩu cũ không đúng";
+                        }
+                        else
+                        {
+                            string password = SecurityHelper.GenerateMD5(newPassword, dtb.Rows[0]["Salt"].ToString());
+                            string query = SqlConnect.UpdateToTableString(
+                                            "Users",
+                                            new string[] { "Password" },
+                                            new object[] { password },
+                                            " Username = N'" + userInfo.Username + "'"
+                                        );
+                            SqlConnect.ExecuteQueryUsingTran(query);
+                            if (!SqlConnect.Error)
+                            {
+                                status = true;
+                                message = "Đổi mật khẩu thành công.";
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            return new JsonResult
+            {
+                Data = new { status = status, message = message },
+                ContentType = "application/json",
+                ContentEncoding = System.Text.Encoding.UTF8,
+                MaxJsonLength = Int32.MaxValue
             };
         }
     }

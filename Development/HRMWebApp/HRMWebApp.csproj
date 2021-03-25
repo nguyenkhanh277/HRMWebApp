@@ -375,10 +375,10 @@
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Shared\NotAuthentication.cshtml" />
-    <Content Include="Views\Payrolls\PayrollsDetail.cshtml" />
     <Content Include="Views\Payrolls\Index.cshtml" />
     <Content Include="Views\Users\Index.cshtml" />
     <Content Include="Views\Users\UsersAddEdit.cshtml" />
+    <Content Include="Views\Home\ChangePassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

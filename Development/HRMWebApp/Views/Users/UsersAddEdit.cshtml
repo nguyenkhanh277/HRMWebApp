@@ -9,7 +9,7 @@
     string typeOfContact = ViewBag.typeOfContact;
 }
 
-@using (Html.BeginForm("add_edit_users", "Users", System.Web.Mvc.FormMethod.Post, new { enctype = "multipart/form-data", id = "create-form-popup", @class = "create-form-popup form-horizontal" }))
+@using (Html.BeginForm("UsersAddEdit", "Users", System.Web.Mvc.FormMethod.Post, new { enctype = "multipart/form-data", id = "create-form-popup", @class = "create-form-popup form-horizontal" }))
 {
     <div class="panel panel-primary background-transparent" style="margin-bottom: 0px;">
         <div class="panel-body">

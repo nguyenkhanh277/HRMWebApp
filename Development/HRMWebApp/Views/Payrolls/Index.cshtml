@@ -23,11 +23,17 @@
                     <div class="col-xs-8 col-sm-8 col-md-10 col-lg-10 file-loading margin-bottom">
                         <input id="FileUpload" name="FileUpload" type="file" style="padding-top:6px;">
                     </div>
-                    <div class="col-xs-4 col-sm-4 col-md-2 col-lg-2">
+                    <div class="col-xs-3 col-sm-3 col-md-2 col-lg-2">
                         <button type="button" id="btn-filter" class="btn btn-success" style="width:110px;"><i class="fa fa-filter"></i> Lọc</button>
                     </div>
-                    <div class="col-xs-8 col-sm-8 col-md-10 col-lg-10">
+                    <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">
                         <button type="button" id="btn-upload" class="btn btn-warning"><i class="fa fa-upload"></i> Tải lên bảng lương</button>
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4 margin-bottom">
+                        <button type="button" id="btn-download" class="btn btn-primary" onclick="window.open('/Content/Uploads/Templates/PayrollsTemplate.xlsx')"><i class="fa fa-download"></i> Tải xuống bản mẫu</button>
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-md-2 col-lg-2">
+                        <button type="button" id="btn-remove-all" class="btn btn-danger"><i class="fa fa-remove"></i> Xóa bảng lương</button>
                     </div>
                 </div>
                 <div class="box-body scrolls">
@@ -38,6 +44,8 @@
                         </colgroup>
                         <thead>
                             <tr>
+                                <th rowspan="2" style="width:40px;" class="text-center no-sort">Xóa</th>
+                                @*<th rowspan="2" style="width:40px;" class="text-center no-sort">Sửa</th>*@
                                 <th rowspan="2" class="text-center" style="width: 10px">STT</th>
                                 <th rowspan="2" class="text-center" style="min-width:100px; width:100px;">Employee Code</th>
                                 <th rowspan="2" class="text-center" style="min-width:150px;">Employee Name</th>
@@ -91,6 +99,25 @@
     <script src="/Content/lib/datatables/fastclick.js"></script>
     <script src="/Content/lib/select2/select2.min.js"></script>
     <script>
+
+        var remove = function (id) {
+            if (confirm("Bạn có chắc chắn muốn xóa không?")) {
+                $.ajax({
+                    cache: false,
+                    async: true,
+                    type: "POST",
+                    url: '@Url.Action("RemovePayrolls", "Payrolls")',
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.status) {
+                            loadList.ajax.reload(null, false);
+                        }
+                        alert(data.message);
+                    }
+                });
+            }
+        };
+
         var loadList;
         $(function () {
             function pageLoad() {
@@ -114,6 +141,7 @@
                 $("#btn-filter").click(function (e) {
                     loadList.ajax.reload(null, false);
                 });
+
                 loadList = $('#data-list').DataTable({
                     ajax: {
                         url: '@Url.Action("PayrollsList", "Payrolls")',
@@ -162,6 +190,29 @@
                 $("#btn-upload").click(function (e) {
                     if (confirm("Bạn có chắc chắn tải lên bảng lương của tháng " + $("#ddlMonth").val() + " năm " + $("#ddlYear").val() + " không?")) {
                         $("#frm-detail").trigger("submit");
+                    }
+                });
+
+                $("#btn-remove-all").click(function (e) {
+                    if (confirm("Bạn có chắc chắn xóa bảng lương của tháng " + $("#ddlMonth").val() + " năm " + $("#ddlYear").val() + " không?")) {
+                        var month = $("#ddlMonth").val()
+                        var year = $("#ddlYear").val()
+                        $.ajax({
+                            cache: false,
+                            async: true,
+                            type: "POST",
+                            url: '@Url.Action("RemovePayrollsAll", "Payrolls")',
+                            data: {
+                                month: month,
+                                year: year
+                            },
+                            success: function (data) {
+                                if (data.status) {
+                                    loadList.ajax.reload(null, false);
+                                }
+                                alert(data.message);
+                            }
+                        });
                     }
                 });
             }

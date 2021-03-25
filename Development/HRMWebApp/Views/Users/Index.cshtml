@@ -4,7 +4,7 @@
 }
 <section class="list-widget widget">
     <header>
-        <h4>Danh sách nhân viên</h4>
+        <h4>DANH SÁCH NHÂN VIÊN</h4>
     </header>
     <div class="body">
         <div class="row form-group">
@@ -61,7 +61,7 @@
                     cache: false,
                     async: true,
                     type: "POST",
-                    url: '@Url.Action("remove_users", "Users")',
+                    url: '@Url.Action("RemoveUsers", "Users")',
                     data: { username: username },
                     success: function (data) {
                         if (data.status) {

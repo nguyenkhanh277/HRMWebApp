@@ -1,5 +1,6 @@
 ﻿using HRMWebApp.Helper;
 using HRMWebApp.Models;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -69,21 +70,12 @@ namespace HRMWebApp.Controllers
         }
 
         [UserAuthenticationFilter(AllUser: true)]
-        public ActionResult PayrollsDetail()
-        {
-            ViewBag.listMonth = ListMonth(false);
-            ViewBag.listYear = ListYear(false);
-            ViewBag.listUser = ListUser(true);
-            return View();
-        }
-
-
-        [UserAuthenticationFilter(AllUser: true)]
         public ActionResult PayrollsList(string month, string year)
         {
-                InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
+            InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
             DataTable dtb = SqlConnect.GetData(
                 @"SELECT 
+	                Payrolls.ID,
 	                Payrolls.EmployeeCode,
 	                Users.EmployeeName, 
 	                Payrolls.ActualWorkingDays,
@@ -114,6 +106,8 @@ namespace HRMWebApp.Controllers
             for (int i = 0; i < dtb.Rows.Count; i++)
             {
                 lResult.Add(new string[] {
+                    "<div><button type='button' class='btn btn-danger btn-remove' onclick=\"remove('" + dtb.Rows[i]["ID"].ToString() + "')\"><i class='fa fa-remove'></i></div>",
+                    //"<div><button type='button' class='btn btn-success btn-edit' onclick=\"showForm('" + dtb.Rows[i]["ID"].ToString() + "')\"><i class='fa fa-edit'></i></div>",
                     (i + 1).ToString(),
                     dtb.Rows[i]["EmployeeCode"].ToString(),
                     dtb.Rows[i]["EmployeeName"].ToString(),
@@ -149,6 +143,69 @@ namespace HRMWebApp.Controllers
                 MaxJsonLength = Int32.MaxValue,
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
 
+            };
+        }
+
+        [UserAuthenticationFilter(AllUser: true), HttpPost]
+        public JsonResult RemovePayrolls(string id)
+        {
+            bool status = false;
+            string message = "Xóa thất bại";
+            try
+            {
+                if (!String.IsNullOrEmpty(id))
+                {
+                    string query = SqlConnect.DeleteFromTableString(
+                                        "Payrolls",
+                                        " ID = N'" + id + "'"
+                                    );
+                    SqlConnect.ExecuteQueryUsingTran(query);
+                    if (!SqlConnect.Error)
+                    {
+                        status = true;
+                        message = "Thành công.";
+                    }
+                }
+            }
+            catch { }
+            return new JsonResult
+            {
+                Data = new { status = status, message = message },
+                ContentType = "application/json",
+                ContentEncoding = System.Text.Encoding.UTF8,
+                MaxJsonLength = Int32.MaxValue
+            };
+        }
+
+        [UserAuthenticationFilter(AllUser: true), HttpPost]
+        public JsonResult RemovePayrollsAll(string month, string year)
+        {
+            bool status = false;
+            string message = "Xóa thất bại";
+            try
+            {
+                InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
+                if (!String.IsNullOrEmpty(month) && !String.IsNullOrEmpty(year))
+                {
+                    string query = SqlConnect.DeleteFromTableString(
+                                        "Payrolls",
+                                        " CompanyID = N'" + userInfo.CompanyID + "' AND MonthSalary = N'" + month + "' AND YearSalary = N'" + year + "'"
+                                    );
+                    SqlConnect.ExecuteQueryUsingTran(query);
+                    if (!SqlConnect.Error)
+                    {
+                        status = true;
+                        message = "Thành công.";
+                    }
+                }
+            }
+            catch { }
+            return new JsonResult
+            {
+                Data = new { status = status, message = message },
+                ContentType = "application/json",
+                ContentEncoding = System.Text.Encoding.UTF8,
+                MaxJsonLength = Int32.MaxValue
             };
         }
 
@@ -189,6 +246,17 @@ namespace HRMWebApp.Controllers
                                         if (!String.IsNullOrEmpty(dtb.Rows[i][0].ToString()))
                                         {
                                             string employeeCode = dtb.Rows[i][0].ToString();
+                                            string personalTaxCode = dtb.Rows[i][1].ToString();
+                                            string employeeName = dtb.Rows[i][2].ToString();
+                                            string position = dtb.Rows[i][3].ToString();
+                                            string department = dtb.Rows[i][4].ToString();
+                                            string startDate = "1900-01-01";
+                                            try
+                                            {
+                                                startDate = DateTime.Parse(dtb.Rows[i][5].ToString()).ToString("yyyy-MM-dd");
+                                            }
+                                            catch { }
+                                            string typeOfContact = dtb.Rows[i][6].ToString();
                                             string actualWorkingDays = (String.IsNullOrEmpty(dtb.Rows[i][7].ToString()) || dtb.Rows[i][7].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][7].ToString()).ToString());
                                             string basicSalary = (String.IsNullOrEmpty(dtb.Rows[i][8].ToString()) || dtb.Rows[i][8].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][8].ToString()).ToString());
                                             string housingAlowance = (String.IsNullOrEmpty(dtb.Rows[i][9].ToString()) || dtb.Rows[i][9].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][9].ToString()).ToString());
@@ -217,6 +285,15 @@ namespace HRMWebApp.Controllers
                                             string totalEmployeeDeduction = (String.IsNullOrEmpty(dtb.Rows[i][32].ToString()) || dtb.Rows[i][32].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][32].ToString()).ToString());
                                             string incomeToCalculatePITPayable = (String.IsNullOrEmpty(dtb.Rows[i][33].ToString()) || dtb.Rows[i][33].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][33].ToString()).ToString());
                                             string calculatorPITPayable = (String.IsNullOrEmpty(dtb.Rows[i][34].ToString()) || dtb.Rows[i][34].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][34].ToString()).ToString());
+
+                                            string salt = SecurityHelper.CreateSalt(GlobalConstants.DEFAULT_SALT_LENGTH);
+                                            string password = SecurityHelper.GenerateMD5(employeeCode, salt);
+                                            query += "IF NOT EXISTS (SELECT Username FROM Users WHERE EmployeeCode = N'" + employeeCode + "') BEGIN " +
+                                                SqlConnect.InsertToTableString(
+                                                    "Users",
+                                                    new string[] { "Username", "CompanyID", "Salt", "Password", "EmployeeCode", "EmployeeName", "PersonalTaxCode", "Position", "Department", "StartDate", "TypeOfContact", "Status", "CreatedAt", "CreatedBy" },
+                                                    new object[] { employeeCode, userInfo.CompanyID, salt, password, employeeCode, employeeName, personalTaxCode, position, department, startDate, typeOfContact, 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), userInfo.Username }
+                                                ) + " END;";
                                             query +=
                                                SqlConnect.DeleteFromTableString(
                                                    "Payrolls",
@@ -269,6 +346,122 @@ namespace HRMWebApp.Controllers
                 status = result,
                 message = message
             });
+        }
+        [UserAuthenticationFilter(AllUser: true), HttpPost]
+        public ActionResult PayrollDetails(string month, string year, string username)
+        {
+            bool status = false;
+            string message = "Lọc bảng lương chi tiết thất bại";
+            double actualWorkingDays = 0;
+            double basicSalary = 0;
+            double housingAlowance = 0;
+            double transportAllowance = 0;
+            double mobileAllowance = 0;
+            double mealAllowance = 0;
+            double totalSalaryAndAllowances = 0;
+            double bonusPerformance = 0;
+            double nontaxableIncome = 0;
+            double companyBHXH = 0;
+            double companyBHTNLD = 0;
+            double companyBHYT = 0;
+            double companyBHTN = 0;
+            double companyTotal = 0;
+            double companyKPCD = 0;
+            double personalBHXH = 0;
+            double personalBHYT = 0;
+            double personalBHTN = 0;
+            double personalTotal = 0;
+            double pITPayable = 0;
+            double salaryPay = 0;
+            try
+            {
+                InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
+                DataTable dtb = SqlConnect.GetData(
+                   @"SELECT 
+	                Payrolls.ActualWorkingDays,
+	                Payrolls.BasicSalary,
+	                Payrolls.HousingAlowance,
+	                Payrolls.TransportAllowance,
+	                Payrolls.MobileAllowance,
+	                Payrolls.MealAllowance,
+	                Payrolls.TotalSalaryAndAllowances,
+	                Payrolls.BonusPerformance,
+	                Payrolls.NontaxableIncome,
+	                Payrolls.CompanyBHXH,
+	                Payrolls.CompanyBHTNLD,
+	                Payrolls.CompanyBHYT,
+	                Payrolls.CompanyBHTN,
+	                Payrolls.CompanyTotal,
+	                Payrolls.CompanyKPCD,
+	                Payrolls.PersonalBHXH,
+	                Payrolls.PersonalBHYT,
+	                Payrolls.PersonalBHTN,
+	                Payrolls.PersonalTotal,
+	                Payrolls.PITPayable,
+	                Payrolls.SalaryPay
+                FROM Payrolls INNER JOIN Users ON Payrolls.EmployeeCode = Users.EmployeeCode 
+                WHERE Payrolls.CompanyID = N'" + userInfo.CompanyID + "' AND Payrolls.MonthSalary = N'" + month + @"' AND Payrolls.YearSalary = N'" + year + @"' AND Users.Username = N'" + username + @"'");
+                if (dtb.Rows.Count > 0)
+                {
+                    actualWorkingDays = double.Parse(dtb.Rows[0]["ActualWorkingDays"].ToString());
+                    basicSalary = double.Parse(dtb.Rows[0]["BasicSalary"].ToString());
+                    housingAlowance = double.Parse(dtb.Rows[0]["HousingAlowance"].ToString());
+                    transportAllowance = double.Parse(dtb.Rows[0]["TransportAllowance"].ToString());
+                    mobileAllowance = double.Parse(dtb.Rows[0]["MobileAllowance"].ToString());
+                    mealAllowance = double.Parse(dtb.Rows[0]["MealAllowance"].ToString());
+                    totalSalaryAndAllowances = double.Parse(dtb.Rows[0]["TotalSalaryAndAllowances"].ToString());
+                    bonusPerformance = double.Parse(dtb.Rows[0]["BonusPerformance"].ToString());
+                    nontaxableIncome = double.Parse(dtb.Rows[0]["NontaxableIncome"].ToString());
+                    companyBHXH = double.Parse(dtb.Rows[0]["CompanyBHXH"].ToString());
+                    companyBHTNLD = double.Parse(dtb.Rows[0]["CompanyBHTNLD"].ToString());
+                    companyBHYT = double.Parse(dtb.Rows[0]["CompanyBHYT"].ToString());
+                    companyBHTN = double.Parse(dtb.Rows[0]["CompanyBHTN"].ToString());
+                    companyTotal = double.Parse(dtb.Rows[0]["CompanyTotal"].ToString());
+                    companyKPCD = double.Parse(dtb.Rows[0]["CompanyKPCD"].ToString());
+                    personalBHXH = double.Parse(dtb.Rows[0]["PersonalBHXH"].ToString());
+                    personalBHYT = double.Parse(dtb.Rows[0]["PersonalBHYT"].ToString());
+                    personalBHTN = double.Parse(dtb.Rows[0]["PersonalBHTN"].ToString());
+                    personalTotal = double.Parse(dtb.Rows[0]["PersonalTotal"].ToString());
+                    pITPayable = double.Parse(dtb.Rows[0]["PITPayable"].ToString());
+                    salaryPay = double.Parse(dtb.Rows[0]["SalaryPay"].ToString());
+                }
+                status = true;
+                message = "Lọc bảng lương chi tiết thành công";
+            }
+            catch
+            { }
+
+            return new JsonResult()
+            {
+                Data = new { status = status, message = message,
+                    actualWorkingDays = actualWorkingDays.ToString("N0"),
+                    basicSalary = basicSalary.ToString("N0"),
+                    housingAlowance = housingAlowance.ToString("N0"),
+                    transportAllowance = transportAllowance.ToString("N0"),
+                    mobileAllowance = mobileAllowance.ToString("N0"),
+                    mealAllowance = mealAllowance.ToString("N0"),
+                    totalSalaryAndAllowances = totalSalaryAndAllowances.ToString("N0"),
+                    bonusPerformance = bonusPerformance.ToString("N0"),
+                    nontaxableIncome = nontaxableIncome.ToString("N0"),
+                    companyBHXH = companyBHXH.ToString("N0"),
+                    companyBHTNLD = companyBHTNLD.ToString("N0"),
+                    companyBHYT = companyBHYT.ToString("N0"),
+                    companyBHTN = companyBHTN.ToString("N0"),
+                    companyTotal = companyTotal.ToString("N0"),
+                    companyKPCD = companyKPCD.ToString("N0"),
+                    personalBHXH = personalBHXH.ToString("N0"),
+                    personalBHYT = personalBHYT.ToString("N0"),
+                    personalBHTN = personalBHTN.ToString("N0"),
+                    personalTotal = personalTotal.ToString("N0"),
+                    pITPayable = pITPayable.ToString("N0"),
+                    salaryPay = salaryPay.ToString("N0")
+                },
+                ContentType = "application/json",
+                ContentEncoding = System.Text.Encoding.UTF8,
+                MaxJsonLength = Int32.MaxValue,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+
+            };
         }
     }
 }

@@ -6,7 +6,7 @@ namespace HRMWebApp.Models
 {
     public class InfoLogin
     {
-        public String UserName { get; set; }
+        public String Username { get; set; }
         public String CompanyID { get; set; }
         public String EmployeeName { get; set; }
         public DateTime LoginTime { get; set; }

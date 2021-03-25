@@ -1,22 +1,150 @@
 ﻿@{
     ViewBag.Title = "Trang chủ";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    List<SelectListItem> listMonth = ViewBag.listMonth;
+    List<SelectListItem> listYear = ViewBag.listYear;
+    List<SelectListItem> listUser = ViewBag.listUser;
 }
-@*<section class="list-widget widget">
+<section class="list-widget widget">
     <header>
-        <h4></h4>
+        <h4>BẢNG LƯƠNG CHI TIẾT</h4>
     </header>
     <div class="body">
         <div class="form-horizontal">
             <div class="row form-group">
+                <div class="col-xs-4 col-sm-4 col-md-2 col-lg-2">
+                    <div class="input-group-btn">
+                        @Html.DropDownList("ddlMonth", new SelectList(listMonth, "Value", "Text", DateTime.Now.Month.ToString()), new { @class = "form-control select2" })
+                        @Html.DropDownList("ddlYear", new SelectList(listYear, "Value", "Text", DateTime.Now.Year.ToString()), new { @class = "form-control select2" })
+                    </div>
+                </div>
+                @Html.Label("Nhân viên: ", new { @class = "control-label col-xs-2 col-sm-2 col-md-2 col-lg-2", @style = "padding-top:6px;" })
+                <div class="col-xs-5 col-sm-5 col-md-4 col-lg-4 margin-bottom">
+                    @Html.DropDownList("ddlUser", new SelectList(listUser, "Value", "Text", ""), new { @class = "form-control select2" })
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 margin-bottom">
+                    <button type="button" id="btn-filter" class="btn btn-success" style="width:110px;"><i class="fa fa-filter"></i> Lọc</button>
+                </div>
+                <div class="box-body">
+                    <div class="col-xs-12 col-sm-12 col-md-3">
+                        <ul class="list-group color-list item-click">
+                            <li class="list-group-item list-group-item-warning text-center" id="bonusPerformance">Salary and Allowances</li>
+                            <li class="list-group-item list-group-item-primary" id="actualWorkingDays">Actual Working Days<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="basicSalary">Basic Salary<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="housingAlowance">Housing Alowance<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="transportAllowance">Transport Allowance<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="mobileAllowance">Mobile Allowance<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="mealAllowance">Meal Allowance<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-info" id="totalSalaryAndAllowances">1.Total Salary<span class="badge">0</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-3">
+                        <ul class="list-group color-list item-click">
+                            <li class="list-group-item list-group-item-warning text-center" id="bonusPerformance">Company Contribution</li>
+                            <li class="list-group-item list-group-item-primary" id="bonusPerformance">Bonus Performance<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="nontaxableIncome">Nontaxable Income<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="companyBHXH">BHXH (17%)<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="companyBHTNLD">BHTNLĐ (0.5%)<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="companyBHYT">BHYT (3%)<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="companyBHTN">BHTN (1%)<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-success" id="companyTotal">Total (21.5%)<span class="badge">0</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-3">
+                        <ul class="list-group color-list item-click">
+                            <li class="list-group-item list-group-item-warning text-center" id="bonusPerformance">Employees Contribution</li>
+                            <li class="list-group-item list-group-item-primary" id="companyKPCD">KPCĐ (2%)<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="personalBHXH">BHXH (8%)<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="personalBHYT">BHYT (1.5%)<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-primary" id="personalBHTN">BHTN (1%)<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-info" id="personalTotal">2.Total (10.5%)<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-info" id="pITPayable">3.PIT payable<span class="badge">0</span></li>
+                            <li class="list-group-item list-group-item-danger" id="salaryPay">Salary pay (1-2-3)<span class="badge">0</span></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</section>*@
+</section>
 @section Scripts{
+    <script src="/Content/lib/select2/select2.min.js"></script>
     <script>
+        var PayrollDetails = function () {
+            var month = $("#ddlMonth").val();
+            var year = $("#ddlYear").val();
+            var username = $("#ddlUser").val();
+            $.ajax({
+                cache: false,
+                async: true,
+                type: "POST",
+                url: '@Url.Action("PayrollDetails", "Payrolls")',
+                data: {
+                    month: month,
+                    year: year,
+                    username: username
+                },
+                success: function (data) {
+                    if (data.status) {
+                        $('#actualWorkingDays .badge').text(data.actualWorkingDays);
+                        $('#basicSalary .badge').text(data.basicSalary);
+                        $('#housingAlowance .badge').text(data.housingAlowance);
+                        $('#transportAllowance .badge').text(data.transportAllowance);
+                        $('#mobileAllowance .badge').text(data.mobileAllowance);
+                        $('#mealAllowance .badge').text(data.mealAllowance);
+                        $('#totalSalaryAndAllowances .badge').text(data.totalSalaryAndAllowances);
+                        $('#bonusPerformance .badge').text(data.bonusPerformance);
+                        $('#nontaxableIncome .badge').text(data.nontaxableIncome);
+                        $('#companyBHXH .badge').text(data.companyBHXH);
+                        $('#companyBHTNLD .badge').text(data.companyBHTNLD);
+                        $('#companyBHYT .badge').text(data.companyBHYT);
+                        $('#companyBHTN .badge').text(data.companyBHTN);
+                        $('#companyTotal .badge').text(data.companyTotal);
+                        $('#companyKPCD .badge').text(data.companyKPCD);
+                        $('#personalBHXH .badge').text(data.personalBHXH);
+                        $('#personalBHYT .badge').text(data.personalBHYT);
+                        $('#personalBHTN .badge').text(data.personalBHTN);
+                        $('#personalTotal .badge').text(data.personalTotal);
+                        $('#pITPayable .badge').text(data.pITPayable);
+                        $('#salaryPay .badge').text(data.salaryPay);
+                    }
+                    else {
+                        alert(data.message);
+                    }
+                }
+            });
+        }
         $(function () {
             function pageLoad() {
+                $("#ddlMonth").select2({
+                    templateResult: function (d) { return $(d.text); },
+                    templateSelection: function (d) { return $(d.text); },
+                });
+                $("#ddlYear").select2({
+                    templateResult: function (d) { return $(d.text); },
+                    templateSelection: function (d) { return $(d.text); },
+                });
+                $("#ddlUser").select2({
+                    templateResult: function (d) { return $(d.text); },
+                    templateSelection: function (d) { return $(d.text); },
+                });
+
+                $("#ddlMonth").on("change", function (e) {
+                    PayrollDetails();
+                });
+
+                $("#ddlYear").on("change", function (e) {
+                    PayrollDetails();
+                });
+
+                $("#ddlUser").on("change", function (e) {
+                    PayrollDetails();
+                });
+
+                $("#btn-filter").click(function (e) {
+                    PayrollDetails();
+                });
+                PayrollDetails();
             }
             pageLoad();
             PjaxApp.onPageLoad(pageLoad);
