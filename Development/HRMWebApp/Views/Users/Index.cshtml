@@ -39,11 +39,11 @@
     </div>
 </section>
 @section Scripts{
-    <script src="/Content/lib/datatables/jquery.dataTables.min.js"></script>
-    <script src="/Content/lib/datatables/dataTables.bootstrap.min.js"></script>
-    <script src="/Content/lib/datatables/jquery.slimscroll.min.js"></script>
-    <script src="/Content/lib/datatables/fastclick.js"></script>
+    <script src="~/Content/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/lib/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
     <script>
+//////// Open Popup
         var showForm = function (username) {
             var url = '@Url.Action("UsersAddEdit", "Users")' + '?username=' + username;
             showFastGlobalForm(url, (username == "" ? "Tạo mới nhân viên" : "Sửa nhân viên"));
@@ -54,6 +54,7 @@
             $("#modal-fast-create .modal-body").load(url, function () { });
             $("#modal-fast-create").modal("show");
         };
+//////// End Open
 
         var remove = function (username) {
             if (confirm("Bạn có chắc chắn muốn xóa không?")) {
@@ -95,7 +96,7 @@
                 });
 
 
-//////// Modal
+//////// Event Popup
                 var _continue = false;
                 $("#btn-save-popup-continue").click(function (event) {
                     _continue = true;
@@ -145,7 +146,7 @@
                         }
                     });
                 });
-//////// End Modal
+//////// End Event
             }
             pageLoad();
             PjaxApp.onPageLoad(pageLoad);
@@ -153,6 +154,7 @@
     </script>
 }
 
+<!------ Popup ------>
 <div id="modal-fast-create" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

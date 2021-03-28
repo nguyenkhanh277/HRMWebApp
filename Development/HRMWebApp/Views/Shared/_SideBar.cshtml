@@ -1,4 +1,8 @@
-﻿<div id="modal-menu" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+﻿@using HRMWebApp.Models;
+@{
+    InfoLogin _userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
+}
+<div id="modal-menu" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog modal-md">
         <div class="modal-content">
             <div class="modal-header">
@@ -26,12 +30,15 @@
         <li>
             <a href="@Url.Action("ChangePassword","Home")"><i class="fa fa-users"></i> <span class="name">Đổi mật khẩu</span></a>
         </li>
-        <li>
-            <a href="@Url.Action("Index","Users")"><i class="fa fa-users"></i> <span class="name">Nhân viên</span></a>
-        </li>
-        <li>
-            <a href="@Url.Action("Index","Payrolls")"><i class="fa fa-upload"></i> <span class="name">Bảng lương tổng hợp</span></a>
-        </li>
+        @if (_userInfo.Username == "administrator")
+        {
+            <li>
+                <a href="@Url.Action("Index", "Users")"><i class="fa fa-users"></i> <span class="name">Nhân viên</span></a>
+            </li>
+            <li>
+                <a href="@Url.Action("Index", "Payrolls")"><i class="fa fa-upload"></i> <span class="name">Bảng lương tổng hợp</span></a>
+            </li>
+        }
         <li>
             <a href="@Url.Action("Logout","Home")"><i class="fa fa-sign-out"></i> <span class="name">Đăng xuất</span></a>
         </li>

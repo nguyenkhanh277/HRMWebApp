@@ -58,7 +58,7 @@ namespace HRMWebApp.Controllers
             try
             {
                 InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
-                if (All || userInfo.Username == "administrator")
+                if (All)
                 {
                     itemList.Add(new SelectListItem { Selected = false, Text = string.Format("<span class='custom-select-item'>{0}</span>", "Tất cả"), Value = "ALL" });
                 }

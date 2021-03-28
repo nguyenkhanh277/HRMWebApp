@@ -30,7 +30,7 @@
                         <button type="button" id="btn-upload" class="btn btn-warning"><i class="fa fa-upload"></i> Tải lên bảng lương</button>
                     </div>
                     <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4 margin-bottom">
-                        <button type="button" id="btn-download" class="btn btn-primary" onclick="window.open('/Content/Uploads/Templates/PayrollsTemplate.xlsx')"><i class="fa fa-download"></i> Tải xuống bản mẫu</button>
+                        <button type="button" id="btn-download" class="btn btn-primary" onclick="window.location.assign('Content/Uploads/Templates/PayrollsTemplate.xlsx')"><i class="fa fa-download"></i> Tải xuống bản mẫu</button>
                     </div>
                     <div class="col-xs-3 col-sm-3 col-md-2 col-lg-2">
                         <button type="button" id="btn-remove-all" class="btn btn-danger"><i class="fa fa-remove"></i> Xóa bảng lương</button>
@@ -39,7 +39,7 @@
                 <div class="box-body scrolls">
                     <table class="table table-bordered" id="data-list">
                         <colgroup>
-                            <col span="23">
+                            <col span="24">
                             <col style="background-color:#fa501e;">
                         </colgroup>
                         <thead>
@@ -93,11 +93,9 @@
     </section>
 }
 @section Scripts{
-    <script src="/Content/lib/datatables/jquery.dataTables.min.js"></script>
-    <script src="/Content/lib/datatables/dataTables.bootstrap.min.js"></script>
-    <script src="/Content/lib/datatables/jquery.slimscroll.min.js"></script>
-    <script src="/Content/lib/datatables/fastclick.js"></script>
-    <script src="/Content/lib/select2/select2.min.js"></script>
+    <script src="~/Content/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/lib/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/Content/lib/select2/select2.min.js"></script>
     <script>
 
         var remove = function (id) {
