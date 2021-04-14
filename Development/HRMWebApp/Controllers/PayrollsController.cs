@@ -103,8 +103,20 @@ namespace HRMWebApp.Controllers
                 WHERE Payrolls.CompanyID = N'" + userInfo.CompanyID + "' AND Payrolls.MonthSalary = N'" + month + @"' AND Payrolls.YearSalary = N'" + year + @"' 
                 ORDER BY Payrolls.EmployeeCode");
             List<string[]> lResult = new List<string[]>();
+            string basicSalary = "0";
+            string salaryPay = "0";
             for (int i = 0; i < dtb.Rows.Count; i++)
             {
+                try
+                {
+                    basicSalary = (dtb.Rows[i]["BasicSalary"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[i]["BasicSalary"].ToString()));
+                }
+                catch { basicSalary = "0"; }
+                try
+                {
+                    salaryPay = (dtb.Rows[i]["SalaryPay"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[i]["SalaryPay"].ToString()));
+                }
+                catch { salaryPay = "0"; }
                 lResult.Add(new string[] {
                     "<div><button type='button' class='btn btn-danger btn-remove' onclick=\"remove('" + dtb.Rows[i]["ID"].ToString() + "')\"><i class='fa fa-remove'></i></div>",
                     //"<div><button type='button' class='btn btn-success btn-edit' onclick=\"showForm('" + dtb.Rows[i]["ID"].ToString() + "')\"><i class='fa fa-edit'></i></div>",
@@ -112,7 +124,7 @@ namespace HRMWebApp.Controllers
                     dtb.Rows[i]["EmployeeCode"].ToString(),
                     dtb.Rows[i]["EmployeeName"].ToString(),
                     double.Parse(dtb.Rows[i]["ActualWorkingDays"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["BasicSalary"].ToString()).ToString("N0"),
+                    double.Parse(basicSalary).ToString("N0"),
                     double.Parse(dtb.Rows[i]["HousingAlowance"].ToString()).ToString("N0"),
                     double.Parse(dtb.Rows[i]["TransportAllowance"].ToString()).ToString("N0"),
                     double.Parse(dtb.Rows[i]["MobileAllowance"].ToString()).ToString("N0"),
@@ -131,7 +143,7 @@ namespace HRMWebApp.Controllers
                     double.Parse(dtb.Rows[i]["PersonalBHTN"].ToString()).ToString("N0"),
                     double.Parse(dtb.Rows[i]["PersonalTotal"].ToString()).ToString("N0"),
                     double.Parse(dtb.Rows[i]["PITPayable"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["SalaryPay"].ToString()).ToString("N0")
+                    double.Parse(salaryPay).ToString("N0")
                 });
             }
 
@@ -259,6 +271,11 @@ namespace HRMWebApp.Controllers
                                             string typeOfContact = dtb.Rows[i][6].ToString();
                                             string actualWorkingDays = (String.IsNullOrEmpty(dtb.Rows[i][7].ToString()) || dtb.Rows[i][7].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][7].ToString()).ToString());
                                             string basicSalary = (String.IsNullOrEmpty(dtb.Rows[i][8].ToString()) || dtb.Rows[i][8].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][8].ToString()).ToString());
+                                            try
+                                            {
+                                                basicSalary = SecurityHelper.MD5_Encrypt(basicSalary);
+                                            }
+                                            catch { basicSalary = "0"; }
                                             string housingAlowance = (String.IsNullOrEmpty(dtb.Rows[i][9].ToString()) || dtb.Rows[i][9].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][9].ToString()).ToString());
                                             string transportAllowance = (String.IsNullOrEmpty(dtb.Rows[i][10].ToString()) || dtb.Rows[i][10].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][10].ToString()).ToString());
                                             string mobileAllowance = (String.IsNullOrEmpty(dtb.Rows[i][11].ToString()) || dtb.Rows[i][11].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][11].ToString()).ToString());
@@ -278,6 +295,11 @@ namespace HRMWebApp.Controllers
                                             string personalTotal = (String.IsNullOrEmpty(dtb.Rows[i][25].ToString()) || dtb.Rows[i][25].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][25].ToString()).ToString());
                                             string pITPayable = (String.IsNullOrEmpty(dtb.Rows[i][26].ToString()) || dtb.Rows[i][26].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][26].ToString()).ToString());
                                             string salaryPay = (String.IsNullOrEmpty(dtb.Rows[i][27].ToString()) || dtb.Rows[i][27].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][27].ToString()).ToString());
+                                            try
+                                            {
+                                                salaryPay = SecurityHelper.MD5_Encrypt(salaryPay);
+                                            }
+                                            catch { salaryPay = "0"; }
                                             string taxableIncome = (String.IsNullOrEmpty(dtb.Rows[i][28].ToString()) || dtb.Rows[i][28].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][28].ToString()).ToString());
                                             string personalDeduction = (String.IsNullOrEmpty(dtb.Rows[i][29].ToString()) || dtb.Rows[i][29].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][29].ToString()).ToString());
                                             string numberOfDependant = (String.IsNullOrEmpty(dtb.Rows[i][30].ToString()) || dtb.Rows[i][30].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][30].ToString()).ToString());
@@ -403,8 +425,20 @@ namespace HRMWebApp.Controllers
                 WHERE Payrolls.CompanyID = N'" + userInfo.CompanyID + "' AND Payrolls.MonthSalary = N'" + month + @"' AND Payrolls.YearSalary = N'" + year + @"' AND Users.Username = N'" + username + @"'");
                 if (dtb.Rows.Count > 0)
                 {
+                    string basic_Salary = "0";
+                    string salary_Pay = "0";
+                    try
+                    {
+                        basic_Salary = (dtb.Rows[0]["BasicSalary"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[0]["BasicSalary"].ToString()));
+                    }
+                    catch { basic_Salary = "0"; }
+                    try
+                    {
+                        salary_Pay = (dtb.Rows[0]["SalaryPay"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[0]["SalaryPay"].ToString()));
+                    }
+                    catch { salary_Pay = "0"; }
                     actualWorkingDays = double.Parse(dtb.Rows[0]["ActualWorkingDays"].ToString());
-                    basicSalary = double.Parse(dtb.Rows[0]["BasicSalary"].ToString());
+                    basicSalary = double.Parse(basic_Salary);
                     housingAlowance = double.Parse(dtb.Rows[0]["HousingAlowance"].ToString());
                     transportAllowance = double.Parse(dtb.Rows[0]["TransportAllowance"].ToString());
                     mobileAllowance = double.Parse(dtb.Rows[0]["MobileAllowance"].ToString());
@@ -423,7 +457,7 @@ namespace HRMWebApp.Controllers
                     personalBHTN = double.Parse(dtb.Rows[0]["PersonalBHTN"].ToString());
                     personalTotal = double.Parse(dtb.Rows[0]["PersonalTotal"].ToString());
                     pITPayable = double.Parse(dtb.Rows[0]["PITPayable"].ToString());
-                    salaryPay = double.Parse(dtb.Rows[0]["SalaryPay"].ToString());
+                    salaryPay = double.Parse(salary_Pay);
                 }
                 status = true;
                 message = "Lọc bảng lương chi tiết thành công";
@@ -433,7 +467,10 @@ namespace HRMWebApp.Controllers
 
             return new JsonResult()
             {
-                Data = new { status = status, message = message,
+                Data = new
+                {
+                    status = status,
+                    message = message,
                     actualWorkingDays = actualWorkingDays.ToString("N0"),
                     basicSalary = basicSalary.ToString("N0"),
                     housingAlowance = housingAlowance.ToString("N0"),
