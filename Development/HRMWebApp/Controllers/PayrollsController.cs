@@ -69,6 +69,97 @@ namespace HRMWebApp.Controllers
             return itemList;
         }
 
+        #region old()
+        //[UserAuthenticationFilter(AllUser: true)]
+        //public ActionResult PayrollsList(string month, string year)
+        //{
+        //    InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
+        //    DataTable dtb = SqlConnect.GetData(
+        //        @"SELECT 
+        //         Payrolls.ID,
+        //         Payrolls.EmployeeCode,
+        //         Users.EmployeeName, 
+        //         Payrolls.ActualWorkingDays,
+        //         Payrolls.BasicSalary,
+        //         Payrolls.HousingAlowance,
+        //         Payrolls.TransportAllowance,
+        //         Payrolls.MobileAllowance,
+        //         Payrolls.MealAllowance,
+        //         Payrolls.TotalSalaryAndAllowances,
+        //         Payrolls.BonusPerformance,
+        //         Payrolls.NontaxableIncome,
+        //         Payrolls.CompanyBHXH,
+        //         Payrolls.CompanyBHTNLD,
+        //         Payrolls.CompanyBHYT,
+        //         Payrolls.CompanyBHTN,
+        //         Payrolls.CompanyTotal,
+        //         Payrolls.CompanyKPCD,
+        //         Payrolls.PersonalBHXH,
+        //         Payrolls.PersonalBHYT,
+        //         Payrolls.PersonalBHTN,
+        //         Payrolls.PersonalTotal,
+        //         Payrolls.PITPayable,
+        //         Payrolls.SalaryPay
+        //        FROM Payrolls INNER JOIN Users ON Payrolls.EmployeeCode = Users.EmployeeCode 
+        //        WHERE Payrolls.CompanyID = N'" + userInfo.CompanyID + "' AND Payrolls.MonthSalary = N'" + month + @"' AND Payrolls.YearSalary = N'" + year + @"' 
+        //        ORDER BY Payrolls.EmployeeCode");
+        //    List<string[]> lResult = new List<string[]>();
+        //    string basicSalary = "0";
+        //    string salaryPay = "0";
+        //    for (int i = 0; i < dtb.Rows.Count; i++)
+        //    {
+        //        try
+        //        {
+        //            basicSalary = (dtb.Rows[i]["BasicSalary"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[i]["BasicSalary"].ToString()));
+        //        }
+        //        catch { basicSalary = "0"; }
+        //        try
+        //        {
+        //            salaryPay = (dtb.Rows[i]["SalaryPay"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[i]["SalaryPay"].ToString()));
+        //        }
+        //        catch { salaryPay = "0"; }
+        //        lResult.Add(new string[] {
+        //            "<div><button type='button' class='btn btn-danger btn-remove' onclick=\"remove('" + dtb.Rows[i]["ID"].ToString() + "')\"><i class='fa fa-remove'></i></div>",
+        //            //"<div><button type='button' class='btn btn-success btn-edit' onclick=\"showForm('" + dtb.Rows[i]["ID"].ToString() + "')\"><i class='fa fa-edit'></i></div>",
+        //            (i + 1).ToString(),
+        //            dtb.Rows[i]["EmployeeCode"].ToString(),
+        //            dtb.Rows[i]["EmployeeName"].ToString(),
+        //            double.Parse(dtb.Rows[i]["ActualWorkingDays"].ToString()).ToString("N0"),
+        //            double.Parse(basicSalary).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["HousingAlowance"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["TransportAllowance"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["MobileAllowance"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["MealAllowance"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["TotalSalaryAndAllowances"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["BonusPerformance"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["NontaxableIncome"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["CompanyBHXH"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["CompanyBHTNLD"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["CompanyBHYT"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["CompanyBHTN"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["CompanyTotal"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["CompanyKPCD"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["PersonalBHXH"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["PersonalBHYT"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["PersonalBHTN"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["PersonalTotal"].ToString()).ToString("N0"),
+        //            double.Parse(dtb.Rows[i]["PITPayable"].ToString()).ToString("N0"),
+        //            double.Parse(salaryPay).ToString("N0")
+        //        });
+        //    }
+
+        //    return new JsonResult()
+        //    {
+        //        Data = new { data = lResult.ToArray() },
+        //        ContentType = "application/json",
+        //        ContentEncoding = System.Text.Encoding.UTF8,
+        //        MaxJsonLength = Int32.MaxValue,
+        //        JsonRequestBehavior = JsonRequestBehavior.AllowGet
+
+        //    };
+        //}
+        #endregion
+
         [UserAuthenticationFilter(AllUser: true)]
         public ActionResult PayrollsList(string month, string year)
         {
@@ -103,20 +194,17 @@ namespace HRMWebApp.Controllers
                 WHERE Payrolls.CompanyID = N'" + userInfo.CompanyID + "' AND Payrolls.MonthSalary = N'" + month + @"' AND Payrolls.YearSalary = N'" + year + @"' 
                 ORDER BY Payrolls.EmployeeCode");
             List<string[]> lResult = new List<string[]>();
-            string basicSalary = "0";
-            string salaryPay = "0";
+            
             for (int i = 0; i < dtb.Rows.Count; i++)
             {
-                try
+                List<string> arrayData = new List<string>();
+                for (int j = 4; j < 24; j++)
                 {
-                    basicSalary = (dtb.Rows[i]["BasicSalary"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[i]["BasicSalary"].ToString()));
+                    string data = (dtb.Rows[i][j].ToString() == "0" ? "0" : dtb.Rows[i][j].ToString());
+                    arrayData.Add(data);
                 }
-                catch { basicSalary = "0"; }
-                try
-                {
-                    salaryPay = (dtb.Rows[i]["SalaryPay"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[i]["SalaryPay"].ToString()));
-                }
-                catch { salaryPay = "0"; }
+                arrayData = SecurityHelper.MD5_Decrypt(arrayData);
+
                 lResult.Add(new string[] {
                     "<div><button type='button' class='btn btn-danger btn-remove' onclick=\"remove('" + dtb.Rows[i]["ID"].ToString() + "')\"><i class='fa fa-remove'></i></div>",
                     //"<div><button type='button' class='btn btn-success btn-edit' onclick=\"showForm('" + dtb.Rows[i]["ID"].ToString() + "')\"><i class='fa fa-edit'></i></div>",
@@ -124,26 +212,26 @@ namespace HRMWebApp.Controllers
                     dtb.Rows[i]["EmployeeCode"].ToString(),
                     dtb.Rows[i]["EmployeeName"].ToString(),
                     double.Parse(dtb.Rows[i]["ActualWorkingDays"].ToString()).ToString("N0"),
-                    double.Parse(basicSalary).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["HousingAlowance"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["TransportAllowance"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["MobileAllowance"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["MealAllowance"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["TotalSalaryAndAllowances"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["BonusPerformance"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["NontaxableIncome"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["CompanyBHXH"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["CompanyBHTNLD"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["CompanyBHYT"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["CompanyBHTN"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["CompanyTotal"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["CompanyKPCD"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["PersonalBHXH"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["PersonalBHYT"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["PersonalBHTN"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["PersonalTotal"].ToString()).ToString("N0"),
-                    double.Parse(dtb.Rows[i]["PITPayable"].ToString()).ToString("N0"),
-                    double.Parse(salaryPay).ToString("N0")
+                    double.Parse(arrayData[0]).ToString("N0"),
+                    double.Parse(arrayData[1]).ToString("N0"),
+                    double.Parse(arrayData[2]).ToString("N0"),
+                    double.Parse(arrayData[3]).ToString("N0"),
+                    double.Parse(arrayData[4]).ToString("N0"),
+                    double.Parse(arrayData[5]).ToString("N0"),
+                    double.Parse(arrayData[6]).ToString("N0"),
+                    double.Parse(arrayData[7]).ToString("N0"),
+                    double.Parse(arrayData[8]).ToString("N0"),
+                    double.Parse(arrayData[9]).ToString("N0"),
+                    double.Parse(arrayData[10]).ToString("N0"),
+                    double.Parse(arrayData[11]).ToString("N0"),
+                    double.Parse(arrayData[12]).ToString("N0"),
+                    double.Parse(arrayData[13]).ToString("N0"),
+                    double.Parse(arrayData[14]).ToString("N0"),
+                    double.Parse(arrayData[15]).ToString("N0"),
+                    double.Parse(arrayData[16]).ToString("N0"),
+                    double.Parse(arrayData[17]).ToString("N0"),
+                    double.Parse(arrayData[18]).ToString("N0"),
+                    double.Parse(arrayData[19]).ToString("N0")
                 });
             }
 
@@ -157,7 +245,6 @@ namespace HRMWebApp.Controllers
 
             };
         }
-
         [UserAuthenticationFilter(AllUser: true), HttpPost]
         public JsonResult RemovePayrolls(string id)
         {
@@ -244,7 +331,8 @@ namespace HRMWebApp.Controllers
                         else
                         {
                             string ext = Path.GetExtension(file.FileName);
-                            FileUploadResult fileResult = uploader.RenameUploadFile(file, ext, string.Format("{0}_{1}", file.FileName.Substring(0, file.FileName.LastIndexOf(".")), DateTime.Now.ToString("yyyyMMddHHmmss")));
+                            string fileName = Path.GetFileName(file.FileName);
+                            FileUploadResult fileResult = uploader.RenameUploadFile(file, ext, string.Format("{0}_{1}", fileName.Substring(0, fileName.LastIndexOf(".")), DateTime.Now.ToString("yyyyMMddHHmmss")));
                             if (fileResult.Success)
                             {
                                 string filePath = Server.MapPath(Path.Combine(uploadPath, fileResult.FileName).Replace("~", "").Replace("\\", "/"));
@@ -270,43 +358,42 @@ namespace HRMWebApp.Controllers
                                             catch { }
                                             string typeOfContact = dtb.Rows[i][6].ToString();
                                             string actualWorkingDays = (String.IsNullOrEmpty(dtb.Rows[i][7].ToString()) || dtb.Rows[i][7].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][7].ToString()).ToString());
-                                            string basicSalary = (String.IsNullOrEmpty(dtb.Rows[i][8].ToString()) || dtb.Rows[i][8].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][8].ToString()).ToString());
-                                            try
+                                            //string basicSalary = (String.IsNullOrEmpty(dtb.Rows[i][8].ToString()) || dtb.Rows[i][8].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][8].ToString()).ToString());
+
+                                            List<string> arrayData = new List<string>();
+                                            for (int j = 8; j < 35; j++)
                                             {
-                                                basicSalary = SecurityHelper.MD5_Encrypt(basicSalary);
+                                                string data = (String.IsNullOrEmpty(dtb.Rows[i][j].ToString()) || dtb.Rows[i][j].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][j].ToString()).ToString());
+                                                arrayData.Add(data);
                                             }
-                                            catch { basicSalary = "0"; }
-                                            string housingAlowance = (String.IsNullOrEmpty(dtb.Rows[i][9].ToString()) || dtb.Rows[i][9].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][9].ToString()).ToString());
-                                            string transportAllowance = (String.IsNullOrEmpty(dtb.Rows[i][10].ToString()) || dtb.Rows[i][10].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][10].ToString()).ToString());
-                                            string mobileAllowance = (String.IsNullOrEmpty(dtb.Rows[i][11].ToString()) || dtb.Rows[i][11].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][11].ToString()).ToString());
-                                            string mealAllowance = (String.IsNullOrEmpty(dtb.Rows[i][12].ToString()) || dtb.Rows[i][12].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][12].ToString()).ToString());
-                                            string totalSalaryAndAllowances = (String.IsNullOrEmpty(dtb.Rows[i][13].ToString()) || dtb.Rows[i][13].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][13].ToString()).ToString());
-                                            string bonusPerformance = (String.IsNullOrEmpty(dtb.Rows[i][14].ToString()) || dtb.Rows[i][14].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][14].ToString()).ToString());
-                                            string nontaxableIncome = (String.IsNullOrEmpty(dtb.Rows[i][15].ToString()) || dtb.Rows[i][15].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][15].ToString()).ToString());
-                                            string companyBHXH = (String.IsNullOrEmpty(dtb.Rows[i][16].ToString()) || dtb.Rows[i][16].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][16].ToString()).ToString());
-                                            string companyBHTNLD = (String.IsNullOrEmpty(dtb.Rows[i][17].ToString()) || dtb.Rows[i][17].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][17].ToString()).ToString());
-                                            string companyBHYT = (String.IsNullOrEmpty(dtb.Rows[i][18].ToString()) || dtb.Rows[i][18].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][18].ToString()).ToString());
-                                            string companyBHTN = (String.IsNullOrEmpty(dtb.Rows[i][19].ToString()) || dtb.Rows[i][19].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][19].ToString()).ToString());
-                                            string companyTotal = (String.IsNullOrEmpty(dtb.Rows[i][20].ToString()) || dtb.Rows[i][20].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][20].ToString()).ToString());
-                                            string companyKPCD = (String.IsNullOrEmpty(dtb.Rows[i][21].ToString()) || dtb.Rows[i][21].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][21].ToString()).ToString());
-                                            string personalBHXH = (String.IsNullOrEmpty(dtb.Rows[i][22].ToString()) || dtb.Rows[i][22].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][22].ToString()).ToString());
-                                            string personalBHYT = (String.IsNullOrEmpty(dtb.Rows[i][23].ToString()) || dtb.Rows[i][23].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][23].ToString()).ToString());
-                                            string personalBHTN = (String.IsNullOrEmpty(dtb.Rows[i][24].ToString()) || dtb.Rows[i][24].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][24].ToString()).ToString());
-                                            string personalTotal = (String.IsNullOrEmpty(dtb.Rows[i][25].ToString()) || dtb.Rows[i][25].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][25].ToString()).ToString());
-                                            string pITPayable = (String.IsNullOrEmpty(dtb.Rows[i][26].ToString()) || dtb.Rows[i][26].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][26].ToString()).ToString());
-                                            string salaryPay = (String.IsNullOrEmpty(dtb.Rows[i][27].ToString()) || dtb.Rows[i][27].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][27].ToString()).ToString());
-                                            try
-                                            {
-                                                salaryPay = SecurityHelper.MD5_Encrypt(salaryPay);
-                                            }
-                                            catch { salaryPay = "0"; }
-                                            string taxableIncome = (String.IsNullOrEmpty(dtb.Rows[i][28].ToString()) || dtb.Rows[i][28].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][28].ToString()).ToString());
-                                            string personalDeduction = (String.IsNullOrEmpty(dtb.Rows[i][29].ToString()) || dtb.Rows[i][29].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][29].ToString()).ToString());
-                                            string numberOfDependant = (String.IsNullOrEmpty(dtb.Rows[i][30].ToString()) || dtb.Rows[i][30].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][30].ToString()).ToString());
-                                            string totalDeductionForDependant = (String.IsNullOrEmpty(dtb.Rows[i][31].ToString()) || dtb.Rows[i][31].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][31].ToString()).ToString());
-                                            string totalEmployeeDeduction = (String.IsNullOrEmpty(dtb.Rows[i][32].ToString()) || dtb.Rows[i][32].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][32].ToString()).ToString());
-                                            string incomeToCalculatePITPayable = (String.IsNullOrEmpty(dtb.Rows[i][33].ToString()) || dtb.Rows[i][33].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][33].ToString()).ToString());
-                                            string calculatorPITPayable = (String.IsNullOrEmpty(dtb.Rows[i][34].ToString()) || dtb.Rows[i][34].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][34].ToString()).ToString());
+                                            arrayData = SecurityHelper.MD5_Encrypt(arrayData);
+                                            string basicSalary = arrayData[0];
+                                            string housingAlowance = arrayData[1];
+                                            string transportAllowance = arrayData[2];
+                                            string mobileAllowance = arrayData[3];
+                                            string mealAllowance = arrayData[4];
+                                            string totalSalaryAndAllowances = arrayData[5];
+                                            string bonusPerformance = arrayData[6];
+                                            string nontaxableIncome = arrayData[7];
+                                            string companyBHXH = arrayData[8];
+                                            string companyBHTNLD = arrayData[9];
+                                            string companyBHYT = arrayData[10];
+                                            string companyBHTN = arrayData[11];
+                                            string companyTotal = arrayData[12];
+                                            string companyKPCD = arrayData[13];
+                                            string personalBHXH = arrayData[14];
+                                            string personalBHYT = arrayData[15];
+                                            string personalBHTN = arrayData[16];
+                                            string personalTotal = arrayData[17];
+                                            string pITPayable = arrayData[18];
+                                            string salaryPay = arrayData[19];
+                                            string taxableIncome = arrayData[20];
+                                            string personalDeduction = arrayData[21];
+                                            string numberOfDependant = arrayData[22];
+                                            string totalDeductionForDependant = arrayData[23];
+                                            string totalEmployeeDeduction = arrayData[24];
+                                            string incomeToCalculatePITPayable = arrayData[25];
+                                            string calculatorPITPayable = arrayData[26];
 
                                             string salt = SecurityHelper.CreateSalt(GlobalConstants.DEFAULT_SALT_LENGTH);
                                             string password = SecurityHelper.GenerateMD5(employeeCode, salt);
@@ -362,6 +449,7 @@ namespace HRMWebApp.Controllers
             catch (Exception ex)
             {
                 message = "Tải lên bảng lương thất bại. Lỗi dòng " + errorRowIndex + " (" + ex.ToString() + ")";
+                GlobalConstants._log.Error(ex.ToString());
             }
             return Json(new
             {
@@ -425,45 +513,44 @@ namespace HRMWebApp.Controllers
                 WHERE Payrolls.CompanyID = N'" + userInfo.CompanyID + "' AND Payrolls.MonthSalary = N'" + month + @"' AND Payrolls.YearSalary = N'" + year + @"' AND Users.Username = N'" + username + @"'");
                 if (dtb.Rows.Count > 0)
                 {
-                    string basic_Salary = "0";
-                    string salary_Pay = "0";
-                    try
+                    List<string> arrayData = new List<string>();
+                    for (int j = 1; j < 21; j++)
                     {
-                        basic_Salary = (dtb.Rows[0]["BasicSalary"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[0]["BasicSalary"].ToString()));
+                        string data = (dtb.Rows[0][j].ToString() == "0" ? "0" : dtb.Rows[0][j].ToString());
+                        arrayData.Add(data);
                     }
-                    catch { basic_Salary = "0"; }
-                    try
-                    {
-                        salary_Pay = (dtb.Rows[0]["SalaryPay"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[0]["SalaryPay"].ToString()));
-                    }
-                    catch { salary_Pay = "0"; }
+                    arrayData = SecurityHelper.MD5_Decrypt(arrayData);
+
+                    
                     actualWorkingDays = double.Parse(dtb.Rows[0]["ActualWorkingDays"].ToString());
-                    basicSalary = double.Parse(basic_Salary);
-                    housingAlowance = double.Parse(dtb.Rows[0]["HousingAlowance"].ToString());
-                    transportAllowance = double.Parse(dtb.Rows[0]["TransportAllowance"].ToString());
-                    mobileAllowance = double.Parse(dtb.Rows[0]["MobileAllowance"].ToString());
-                    mealAllowance = double.Parse(dtb.Rows[0]["MealAllowance"].ToString());
-                    totalSalaryAndAllowances = double.Parse(dtb.Rows[0]["TotalSalaryAndAllowances"].ToString());
-                    bonusPerformance = double.Parse(dtb.Rows[0]["BonusPerformance"].ToString());
-                    nontaxableIncome = double.Parse(dtb.Rows[0]["NontaxableIncome"].ToString());
-                    companyBHXH = double.Parse(dtb.Rows[0]["CompanyBHXH"].ToString());
-                    companyBHTNLD = double.Parse(dtb.Rows[0]["CompanyBHTNLD"].ToString());
-                    companyBHYT = double.Parse(dtb.Rows[0]["CompanyBHYT"].ToString());
-                    companyBHTN = double.Parse(dtb.Rows[0]["CompanyBHTN"].ToString());
-                    companyTotal = double.Parse(dtb.Rows[0]["CompanyTotal"].ToString());
-                    companyKPCD = double.Parse(dtb.Rows[0]["CompanyKPCD"].ToString());
-                    personalBHXH = double.Parse(dtb.Rows[0]["PersonalBHXH"].ToString());
-                    personalBHYT = double.Parse(dtb.Rows[0]["PersonalBHYT"].ToString());
-                    personalBHTN = double.Parse(dtb.Rows[0]["PersonalBHTN"].ToString());
-                    personalTotal = double.Parse(dtb.Rows[0]["PersonalTotal"].ToString());
-                    pITPayable = double.Parse(dtb.Rows[0]["PITPayable"].ToString());
-                    salaryPay = double.Parse(salary_Pay);
+                    basicSalary = double.Parse(arrayData[0]);
+                    housingAlowance = double.Parse(arrayData[1]);
+                    transportAllowance = double.Parse(arrayData[2]);
+                    mobileAllowance = double.Parse(arrayData[3]);
+                    mealAllowance = double.Parse(arrayData[4]);
+                    totalSalaryAndAllowances = double.Parse(arrayData[5]);
+                    bonusPerformance = double.Parse(arrayData[6]);
+                    nontaxableIncome = double.Parse(arrayData[7]);
+                    companyBHXH = double.Parse(arrayData[8]);
+                    companyBHTNLD = double.Parse(arrayData[9]);
+                    companyBHYT = double.Parse(arrayData[10]);
+                    companyBHTN = double.Parse(arrayData[11]);
+                    companyTotal = double.Parse(arrayData[12]);
+                    companyKPCD = double.Parse(arrayData[13]);
+                    personalBHXH = double.Parse(arrayData[14]);
+                    personalBHYT = double.Parse(arrayData[15]);
+                    personalBHTN = double.Parse(arrayData[16]);
+                    personalTotal = double.Parse(arrayData[17]);
+                    pITPayable = double.Parse(arrayData[18]);
+                    salaryPay = double.Parse(arrayData[19]);
                 }
                 status = true;
                 message = "Lọc bảng lương chi tiết thành công";
             }
-            catch
-            { }
+            catch (Exception ex )
+            {
+                GlobalConstants._log.Error(ex.ToString());
+            }
 
             return new JsonResult()
             {
@@ -500,5 +587,287 @@ namespace HRMWebApp.Controllers
 
             };
         }
+
+        #region old
+        //[UserAuthenticationFilter(AllUser: true), HttpPost]
+        //public ActionResult UploadPayrolls()
+        //{
+        //    bool result = false;
+        //    string message = "";
+        //    int errorRowIndex = 1;
+        //    try
+        //    {
+        //        InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
+        //        int month = int.Parse(Request.Form["ddlMonth"].ToString());
+        //        int year = int.Parse(Request.Form["ddlYear"].ToString());
+        //        String uploadPath = GlobalConstants.FILE_UPLOAD_PATH;
+        //        FileUploader uploader = new FileUploader { UploadPath = uploadPath };
+        //        if (Request.Files.Count > 0)
+        //        {
+        //            HttpPostedFileBase file = Request.Files[0] as HttpPostedFileBase;
+        //            if (file != null && file.ContentLength > 0)
+        //            {
+        //                if (!GlobalHelper.ValidateExtensionEXCEL(Path.GetExtension(file.FileName).ToString().ToLower()))
+        //                    message = "Tải lên bảng lương thất bại. Bảng lương phải là định dạng EXCEL.";
+        //                else
+        //                {
+        //                    string ext = Path.GetExtension(file.FileName);
+        //                    FileUploadResult fileResult = uploader.RenameUploadFile(file, ext, string.Format("{0}_{1}", file.FileName.Substring(0, file.FileName.LastIndexOf(".")), DateTime.Now.ToString("yyyyMMddHHmmss")));
+        //                    if (fileResult.Success)
+        //                    {
+        //                        string filePath = Server.MapPath(Path.Combine(uploadPath, fileResult.FileName).Replace("~", "").Replace("\\", "/"));
+        //                        DataTable dtb = FileUploader.ReadFileExcel(filePath, ext);
+        //                        if (dtb.Rows.Count > 0)
+        //                        {
+        //                            string query = "";
+        //                            for (int i = 0; i < dtb.Rows.Count; i++)
+        //                            {
+        //                                errorRowIndex++;
+        //                                if (!String.IsNullOrEmpty(dtb.Rows[i][0].ToString()))
+        //                                {
+        //                                    string employeeCode = dtb.Rows[i][0].ToString();
+        //                                    string personalTaxCode = dtb.Rows[i][1].ToString();
+        //                                    string employeeName = dtb.Rows[i][2].ToString();
+        //                                    string position = dtb.Rows[i][3].ToString();
+        //                                    string department = dtb.Rows[i][4].ToString();
+        //                                    string startDate = "1900-01-01";
+        //                                    try
+        //                                    {
+        //                                        startDate = DateTime.Parse(dtb.Rows[i][5].ToString()).ToString("yyyy-MM-dd");
+        //                                    }
+        //                                    catch { }
+        //                                    string typeOfContact = dtb.Rows[i][6].ToString();
+        //                                    string actualWorkingDays = (String.IsNullOrEmpty(dtb.Rows[i][7].ToString()) || dtb.Rows[i][7].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][7].ToString()).ToString());
+        //                                    string basicSalary = (String.IsNullOrEmpty(dtb.Rows[i][8].ToString()) || dtb.Rows[i][8].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][8].ToString()).ToString());
+        //                                    try
+        //                                    {
+        //                                        basicSalary = SecurityHelper.MD5_Encrypt(basicSalary);
+        //                                    }
+        //                                    catch { basicSalary = "0"; }
+        //                                    string housingAlowance = (String.IsNullOrEmpty(dtb.Rows[i][9].ToString()) || dtb.Rows[i][9].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][9].ToString()).ToString());
+        //                                    string transportAllowance = (String.IsNullOrEmpty(dtb.Rows[i][10].ToString()) || dtb.Rows[i][10].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][10].ToString()).ToString());
+        //                                    string mobileAllowance = (String.IsNullOrEmpty(dtb.Rows[i][11].ToString()) || dtb.Rows[i][11].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][11].ToString()).ToString());
+        //                                    string mealAllowance = (String.IsNullOrEmpty(dtb.Rows[i][12].ToString()) || dtb.Rows[i][12].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][12].ToString()).ToString());
+        //                                    string totalSalaryAndAllowances = (String.IsNullOrEmpty(dtb.Rows[i][13].ToString()) || dtb.Rows[i][13].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][13].ToString()).ToString());
+        //                                    string bonusPerformance = (String.IsNullOrEmpty(dtb.Rows[i][14].ToString()) || dtb.Rows[i][14].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][14].ToString()).ToString());
+        //                                    string nontaxableIncome = (String.IsNullOrEmpty(dtb.Rows[i][15].ToString()) || dtb.Rows[i][15].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][15].ToString()).ToString());
+        //                                    string companyBHXH = (String.IsNullOrEmpty(dtb.Rows[i][16].ToString()) || dtb.Rows[i][16].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][16].ToString()).ToString());
+        //                                    string companyBHTNLD = (String.IsNullOrEmpty(dtb.Rows[i][17].ToString()) || dtb.Rows[i][17].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][17].ToString()).ToString());
+        //                                    string companyBHYT = (String.IsNullOrEmpty(dtb.Rows[i][18].ToString()) || dtb.Rows[i][18].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][18].ToString()).ToString());
+        //                                    string companyBHTN = (String.IsNullOrEmpty(dtb.Rows[i][19].ToString()) || dtb.Rows[i][19].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][19].ToString()).ToString());
+        //                                    string companyTotal = (String.IsNullOrEmpty(dtb.Rows[i][20].ToString()) || dtb.Rows[i][20].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][20].ToString()).ToString());
+        //                                    string companyKPCD = (String.IsNullOrEmpty(dtb.Rows[i][21].ToString()) || dtb.Rows[i][21].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][21].ToString()).ToString());
+        //                                    string personalBHXH = (String.IsNullOrEmpty(dtb.Rows[i][22].ToString()) || dtb.Rows[i][22].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][22].ToString()).ToString());
+        //                                    string personalBHYT = (String.IsNullOrEmpty(dtb.Rows[i][23].ToString()) || dtb.Rows[i][23].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][23].ToString()).ToString());
+        //                                    string personalBHTN = (String.IsNullOrEmpty(dtb.Rows[i][24].ToString()) || dtb.Rows[i][24].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][24].ToString()).ToString());
+        //                                    string personalTotal = (String.IsNullOrEmpty(dtb.Rows[i][25].ToString()) || dtb.Rows[i][25].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][25].ToString()).ToString());
+        //                                    string pITPayable = (String.IsNullOrEmpty(dtb.Rows[i][26].ToString()) || dtb.Rows[i][26].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][26].ToString()).ToString());
+        //                                    string salaryPay = (String.IsNullOrEmpty(dtb.Rows[i][27].ToString()) || dtb.Rows[i][27].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][27].ToString()).ToString());
+        //                                    try
+        //                                    {
+        //                                        salaryPay = SecurityHelper.MD5_Encrypt(salaryPay);
+        //                                    }
+        //                                    catch { salaryPay = "0"; }
+        //                                    string taxableIncome = (String.IsNullOrEmpty(dtb.Rows[i][28].ToString()) || dtb.Rows[i][28].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][28].ToString()).ToString());
+        //                                    string personalDeduction = (String.IsNullOrEmpty(dtb.Rows[i][29].ToString()) || dtb.Rows[i][29].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][29].ToString()).ToString());
+        //                                    string numberOfDependant = (String.IsNullOrEmpty(dtb.Rows[i][30].ToString()) || dtb.Rows[i][30].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][30].ToString()).ToString());
+        //                                    string totalDeductionForDependant = (String.IsNullOrEmpty(dtb.Rows[i][31].ToString()) || dtb.Rows[i][31].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][31].ToString()).ToString());
+        //                                    string totalEmployeeDeduction = (String.IsNullOrEmpty(dtb.Rows[i][32].ToString()) || dtb.Rows[i][32].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][32].ToString()).ToString());
+        //                                    string incomeToCalculatePITPayable = (String.IsNullOrEmpty(dtb.Rows[i][33].ToString()) || dtb.Rows[i][33].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][33].ToString()).ToString());
+        //                                    string calculatorPITPayable = (String.IsNullOrEmpty(dtb.Rows[i][34].ToString()) || dtb.Rows[i][34].ToString() == "-" ? "0" : double.Parse(dtb.Rows[i][34].ToString()).ToString());
+
+        //                                    string salt = SecurityHelper.CreateSalt(GlobalConstants.DEFAULT_SALT_LENGTH);
+        //                                    string password = SecurityHelper.GenerateMD5(employeeCode, salt);
+        //                                    query += "IF NOT EXISTS (SELECT Username FROM Users WHERE EmployeeCode = N'" + employeeCode + "') BEGIN " +
+        //                                        SqlConnect.InsertToTableString(
+        //                                            "Users",
+        //                                            new string[] { "Username", "CompanyID", "Salt", "Password", "EmployeeCode", "EmployeeName", "PersonalTaxCode", "Position", "Department", "StartDate", "TypeOfContact", "Status", "CreatedAt", "CreatedBy" },
+        //                                            new object[] { employeeCode, userInfo.CompanyID, salt, password, employeeCode, employeeName, personalTaxCode, position, department, startDate, typeOfContact, 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), userInfo.Username }
+        //                                        ) + " END;";
+        //                                    query +=
+        //                                       SqlConnect.DeleteFromTableString(
+        //                                           "Payrolls",
+        //                                           " CompanyID = N'" + userInfo.CompanyID + "' AND EmployeeCode = N'" + dtb.Rows[i][0].ToString() + "' AND MonthSalary = N'" + month + "' AND YearSalary = N'" + year + "'"
+        //                                       );
+        //                                    query +=
+        //                                        SqlConnect.InsertToTableString(
+        //                                            "Payrolls",
+        //                                            new string[] { "CompanyID", "MonthSalary", "YearSalary",
+        //                                            "EmployeeCode", "ActualWorkingDays", "BasicSalary", "HousingAlowance", "TransportAllowance", "MobileAllowance", "MealAllowance", "TotalSalaryAndAllowances", "BonusPerformance", "NontaxableIncome", "CompanyBHXH", "CompanyBHTNLD", "CompanyBHYT", "CompanyBHTN", "CompanyTotal", "CompanyKPCD", "PersonalBHXH", "PersonalBHYT", "PersonalBHTN", "PersonalTotal", "PITPayable", "SalaryPay",
+        //                                            "TaxableIncome", "PersonalDeduction", "NumberOfDependant", "TotalDeductionForDependant", "TotalEmployeeDeduction", "IncomeToCalculatePITPayable", "CalculatorPITPayable"
+        //                                            },
+        //                                            new object[] { userInfo.CompanyID, month, year,
+        //                                            employeeCode, actualWorkingDays, basicSalary, housingAlowance, transportAllowance, mobileAllowance, mealAllowance, totalSalaryAndAllowances, bonusPerformance, nontaxableIncome, companyBHXH, companyBHTNLD, companyBHYT, companyBHTN, companyTotal, companyKPCD, personalBHXH, personalBHYT, personalBHTN, personalTotal, pITPayable, salaryPay,
+        //                                            taxableIncome, personalDeduction, numberOfDependant, totalDeductionForDependant, totalEmployeeDeduction, incomeToCalculatePITPayable, calculatorPITPayable
+        //                                            }
+        //                                        );
+        //                                }
+        //                            }
+        //                            SqlConnect.ExecuteQueryUsingTran(query);
+        //                            if (SqlConnect.Error)
+        //                                message = "Lưu bảng lương thất bại.";
+        //                            else
+        //                            {
+        //                                result = true;
+        //                                message = "Tải lên bảng lương thành công.";
+        //                            }
+        //                        }
+        //                        else
+        //                            message = "Tải lên bảng lương thất bại. Bảng lương không hợp lệ.";
+        //                        FileUploader.RemoveUploadFile(filePath);
+
+        //                    }
+        //                    else
+        //                        message = "Tải lên bảng lương thất bại. Vui lòng thử lại.";
+        //                }
+        //            }
+        //            else
+        //                message = "Tải lên bảng lương thất bại. Chưa chọn bảng lương.";
+        //        }
+        //        else
+        //            message = "Tải lên bảng lương thất bại. Chưa chọn bảng lương.";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        message = "Tải lên bảng lương thất bại. Lỗi dòng " + errorRowIndex + " (" + ex.ToString() + ")";
+        //    }
+        //    return Json(new
+        //    {
+        //        status = result,
+        //        message = message
+        //    });
+        //}
+        //[UserAuthenticationFilter(AllUser: true), HttpPost]
+        //public ActionResult PayrollDetails(string month, string year, string username)
+        //{
+        //    bool status = false;
+        //    string message = "Lọc bảng lương chi tiết thất bại";
+        //    double actualWorkingDays = 0;
+        //    double basicSalary = 0;
+        //    double housingAlowance = 0;
+        //    double transportAllowance = 0;
+        //    double mobileAllowance = 0;
+        //    double mealAllowance = 0;
+        //    double totalSalaryAndAllowances = 0;
+        //    double bonusPerformance = 0;
+        //    double nontaxableIncome = 0;
+        //    double companyBHXH = 0;
+        //    double companyBHTNLD = 0;
+        //    double companyBHYT = 0;
+        //    double companyBHTN = 0;
+        //    double companyTotal = 0;
+        //    double companyKPCD = 0;
+        //    double personalBHXH = 0;
+        //    double personalBHYT = 0;
+        //    double personalBHTN = 0;
+        //    double personalTotal = 0;
+        //    double pITPayable = 0;
+        //    double salaryPay = 0;
+        //    try
+        //    {
+        //        InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
+        //        DataTable dtb = SqlConnect.GetData(
+        //           @"SELECT 
+        //         Payrolls.ActualWorkingDays,
+        //         Payrolls.BasicSalary,
+        //         Payrolls.HousingAlowance,
+        //         Payrolls.TransportAllowance,
+        //         Payrolls.MobileAllowance,
+        //         Payrolls.MealAllowance,
+        //         Payrolls.TotalSalaryAndAllowances,
+        //         Payrolls.BonusPerformance,
+        //         Payrolls.NontaxableIncome,
+        //         Payrolls.CompanyBHXH,
+        //         Payrolls.CompanyBHTNLD,
+        //         Payrolls.CompanyBHYT,
+        //         Payrolls.CompanyBHTN,
+        //         Payrolls.CompanyTotal,
+        //         Payrolls.CompanyKPCD,
+        //         Payrolls.PersonalBHXH,
+        //         Payrolls.PersonalBHYT,
+        //         Payrolls.PersonalBHTN,
+        //         Payrolls.PersonalTotal,
+        //         Payrolls.PITPayable,
+        //         Payrolls.SalaryPay
+        //        FROM Payrolls INNER JOIN Users ON Payrolls.EmployeeCode = Users.EmployeeCode 
+        //        WHERE Payrolls.CompanyID = N'" + userInfo.CompanyID + "' AND Payrolls.MonthSalary = N'" + month + @"' AND Payrolls.YearSalary = N'" + year + @"' AND Users.Username = N'" + username + @"'");
+        //        if (dtb.Rows.Count > 0)
+        //        {
+        //            string basic_Salary = "0";
+        //            string salary_Pay = "0";
+        //            try
+        //            {
+        //                basic_Salary = (dtb.Rows[0]["BasicSalary"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[0]["BasicSalary"].ToString()));
+        //            }
+        //            catch { basic_Salary = "0"; }
+        //            try
+        //            {
+        //                salary_Pay = (dtb.Rows[0]["SalaryPay"].ToString() == "0" ? "0" : SecurityHelper.MD5_Decrypt(dtb.Rows[0]["SalaryPay"].ToString()));
+        //            }
+        //            catch { salary_Pay = "0"; }
+        //            actualWorkingDays = double.Parse(dtb.Rows[0]["ActualWorkingDays"].ToString());
+        //            basicSalary = double.Parse(basic_Salary);
+        //            housingAlowance = double.Parse(dtb.Rows[0]["HousingAlowance"].ToString());
+        //            transportAllowance = double.Parse(dtb.Rows[0]["TransportAllowance"].ToString());
+        //            mobileAllowance = double.Parse(dtb.Rows[0]["MobileAllowance"].ToString());
+        //            mealAllowance = double.Parse(dtb.Rows[0]["MealAllowance"].ToString());
+        //            totalSalaryAndAllowances = double.Parse(dtb.Rows[0]["TotalSalaryAndAllowances"].ToString());
+        //            bonusPerformance = double.Parse(dtb.Rows[0]["BonusPerformance"].ToString());
+        //            nontaxableIncome = double.Parse(dtb.Rows[0]["NontaxableIncome"].ToString());
+        //            companyBHXH = double.Parse(dtb.Rows[0]["CompanyBHXH"].ToString());
+        //            companyBHTNLD = double.Parse(dtb.Rows[0]["CompanyBHTNLD"].ToString());
+        //            companyBHYT = double.Parse(dtb.Rows[0]["CompanyBHYT"].ToString());
+        //            companyBHTN = double.Parse(dtb.Rows[0]["CompanyBHTN"].ToString());
+        //            companyTotal = double.Parse(dtb.Rows[0]["CompanyTotal"].ToString());
+        //            companyKPCD = double.Parse(dtb.Rows[0]["CompanyKPCD"].ToString());
+        //            personalBHXH = double.Parse(dtb.Rows[0]["PersonalBHXH"].ToString());
+        //            personalBHYT = double.Parse(dtb.Rows[0]["PersonalBHYT"].ToString());
+        //            personalBHTN = double.Parse(dtb.Rows[0]["PersonalBHTN"].ToString());
+        //            personalTotal = double.Parse(dtb.Rows[0]["PersonalTotal"].ToString());
+        //            pITPayable = double.Parse(dtb.Rows[0]["PITPayable"].ToString());
+        //            salaryPay = double.Parse(salary_Pay);
+        //        }
+        //        status = true;
+        //        message = "Lọc bảng lương chi tiết thành công";
+        //    }
+        //    catch
+        //    { }
+
+        //    return new JsonResult()
+        //    {
+        //        Data = new
+        //        {
+        //            status = status,
+        //            message = message,
+        //            actualWorkingDays = actualWorkingDays.ToString("N0"),
+        //            basicSalary = basicSalary.ToString("N0"),
+        //            housingAlowance = housingAlowance.ToString("N0"),
+        //            transportAllowance = transportAllowance.ToString("N0"),
+        //            mobileAllowance = mobileAllowance.ToString("N0"),
+        //            mealAllowance = mealAllowance.ToString("N0"),
+        //            totalSalaryAndAllowances = totalSalaryAndAllowances.ToString("N0"),
+        //            bonusPerformance = bonusPerformance.ToString("N0"),
+        //            nontaxableIncome = nontaxableIncome.ToString("N0"),
+        //            companyBHXH = companyBHXH.ToString("N0"),
+        //            companyBHTNLD = companyBHTNLD.ToString("N0"),
+        //            companyBHYT = companyBHYT.ToString("N0"),
+        //            companyBHTN = companyBHTN.ToString("N0"),
+        //            companyTotal = companyTotal.ToString("N0"),
+        //            companyKPCD = companyKPCD.ToString("N0"),
+        //            personalBHXH = personalBHXH.ToString("N0"),
+        //            personalBHYT = personalBHYT.ToString("N0"),
+        //            personalBHTN = personalBHTN.ToString("N0"),
+        //            personalTotal = personalTotal.ToString("N0"),
+        //            pITPayable = pITPayable.ToString("N0"),
+        //            salaryPay = salaryPay.ToString("N0")
+        //        },
+        //        ContentType = "application/json",
+        //        ContentEncoding = System.Text.Encoding.UTF8,
+        //        MaxJsonLength = Int32.MaxValue,
+        //        JsonRequestBehavior = JsonRequestBehavior.AllowGet
+
+        //    };
+        //}
+        #endregion
     }
 }

@@ -8,12 +8,13 @@ namespace HRMWebApp.Helper
     public class GlobalConstants
     {
         public const bool DEBUG_MODE = true;
+        public static readonly log4net.ILog _log = log4net.LogManager.GetLogger("HRM");
 
         #region App & Developer infomation
         public static string APP_NAME = "1";
         public const string APP_VERSION = "1.0";
         public static string BUSINESS_ID = "1";
-        public static string BUSINESS_NAME = "HRM";
+        public static string BUSINESS_NAME = "SmartWage";
         public const string BUSINESS_LICENSE = "LICENSED";
         public const string DEVELOPER_NAME = "Datatech";
         public const string DEVELOPER_WEBSITE = "http://datatech.vn/";

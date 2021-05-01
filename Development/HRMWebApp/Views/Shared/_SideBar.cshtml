@@ -30,11 +30,14 @@
         <li>
             <a href="@Url.Action("ChangePassword","Home")"><i class="fa fa-users"></i> <span class="name">Đổi mật khẩu</span></a>
         </li>
-        @if (_userInfo.Username == "administrator")
+        @if (_userInfo.Username.ToUpper().Equals("ADMINISTRATOR") || _userInfo.Username.ToUpper().Equals("ADMIN") || _userInfo.Roles.Contains("CreateUser"))
         {
             <li>
                 <a href="@Url.Action("Index", "Users")"><i class="fa fa-users"></i> <span class="name">Nhân viên</span></a>
             </li>
+        }
+        @if (_userInfo.Username.ToUpper().Equals("ADMINISTRATOR") || _userInfo.Username.ToUpper().Equals("ADMIN") || _userInfo.Roles.Contains("UploadPayrolls"))
+        {
             <li>
                 <a href="@Url.Action("Index", "Payrolls")"><i class="fa fa-upload"></i> <span class="name">Bảng lương tổng hợp</span></a>
             </li>

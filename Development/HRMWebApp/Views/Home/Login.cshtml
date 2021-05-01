@@ -1,14 +1,18 @@
 ﻿@using HRMWebApp.Models
-@{
-    ViewBag.Title = "Đăng nhập";
-    Layout = "~/Views/Shared/_LayoutBlank.cshtml";
-    ServerMessage serverMessage = ViewBag.Message == null ? new ServerMessage() : (ServerMessage)ViewBag.Message;
-
-}
+@{ ViewBag.Title = "Đăng nhập";
+                Layout = "~/Views/Shared/_LayoutBlank.cshtml";
+                ServerMessage serverMessage = ViewBag.Message == null ? new ServerMessage() : (ServerMessage)ViewBag.Message; }
 
 <section class="widget login-widget login-form">
+    @*<header class="text-align-center">
+        <h4>Giải Pháp Nhân Sự SmartWage</h4>
+        <h4><a href="/"><img class="img-circle" src="~/Content/images/welcome.jpg" /></a></h4>
+        <p class="login-box-msg text-warning" style="font-weight: bold; font-size: 15px;">
+            Hotline: 0.82.82.13579
+        </p>
+    </header>*@
     <header class="text-align-center">
-        <h4>Đăng nhập hệ thống</h4>
+        <h4>Giải Pháp Nhân Sự SmartWage</h4>
         <h4><a href="/"><img class="img-circle" src="~/Content/images/HeaderLogo.jpg" /></a></h4>
         <p class="login-box-msg @serverMessage.Code">
             @serverMessage.Message
@@ -17,7 +21,7 @@
     <div class="body">
         @using (Html.BeginForm("ToDoLogin", "Home", FormMethod.Post, new { @class = "", role = "form" }))
         {
-            Html.AntiForgeryToken();
+            @Html.AntiForgeryToken();
             @Html.ValidationSummary(true)
 
             @Html.Hidden("RedirectUrl", Request.QueryString["redirect_url"])

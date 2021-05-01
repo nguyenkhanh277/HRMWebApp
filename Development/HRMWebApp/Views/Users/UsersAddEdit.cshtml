@@ -8,6 +8,8 @@
     string startDate = ViewBag.startDate;
     string typeOfContact = ViewBag.typeOfContact;
 }
+@using HRMWebApp.Models;
+@model List<UserAuthorities>
 
 @using (Html.BeginForm("UsersAddEdit", "Users", System.Web.Mvc.FormMethod.Post, new { enctype = "multipart/form-data", id = "create-form-popup", @class = "create-form-popup form-horizontal" }))
 {
@@ -23,10 +25,12 @@
                     <div class="col-md-8">
                         @if (String.IsNullOrEmpty(username))
                         {
+                            <input type="hidden" id="Action" name="Action" value="ADD">
                             @Html.TextBox("Username", username, new { @class = "form-control input-transparent", placeholder = "Điền tài khoản" })
                         }
                         else
                         {
+                            <input type="hidden" id="Action" name="Action" value="EDIT">
                             @Html.TextBox("Username", username, new { @class = "form-control input-transparent", placeholder = "Điền tài khoản", @readonly = "readonly" })
                         }
                     </div>
@@ -36,8 +40,8 @@
                     <div class="form-group col-sm-12 margin-bottom">
                         @Html.Label("Mật khẩu", new { @class = "control-label col-md-4" })
                         <div class="col-md-8">
-                                                
-                                @Html.TextBox("Password", "", new { @class = "form-control input-transparent", placeholder = "Điền mật khẩu" })
+
+                            @Html.TextBox("Password", "", new { @class = "form-control input-transparent", placeholder = "Điền mật khẩu" })
                         </div>
                     </div>
                 }
@@ -83,7 +87,66 @@
                         @Html.TextBox("TypeOfContact", typeOfContact, new { @class = "form-control input-transparent", placeholder = "Điền hình thức liên hệ" })
                     </div>
                 </div>
+                <div class="form-group col-sm-12 margin-bottom">
+                    @Html.Label("Phân quyền", new { @class = "control-label col-md-4" })
+                    <div class="col-md-8 ">
+                        <table class="table table-bordered" id="data-list">
+                            <thead>
+                                <tr>
+                                    <th style="width:30px;" class="text-center no-sort">Chọn</th>
+                                    <th style="width:50px;" class="text-center no-sort">Nhóm</th>
+                                    <th style="width:80px" class="text-center">Tên Nhóm</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @*@for (int i = 0; i < userAuthorities.Count; i++)
+                                    {
+                                        <tr>
+                                            <td>@Html.CheckBoxFor(m => userAuthorities[i].Check)</td>
+                                            <td>
+                                                @Html.DisplayTextFor(m => userAuthorities[i].AuthorityGroupId)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayTextFor(m => userAuthorities[i].AuthorityGroupName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayNameFor(m => userAuthorities[i].AuthorityGroupName)
+                                            </td>
+                                            <td>
+                                                @Html.Display("", userAuthorities[i].AuthorityGroupName)
+                                            </td>
+                                            <td>
+                                                <label class="custom-control-label text-xs" for="customCheck1">@userAuthorities[i].AuthorityGroupId</label>
+                                            </td>
+                                            <td>
+                                                <label class="custom-control-label text-xs" for="customCheck1">@userAuthorities[i].AuthorityGroupName</label>
+                                            </td>
+                                        </tr>
+                                    }*@
+                                @{
+                                    int i = 0;
+                                    foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@Html.CheckBoxFor(m => Model[i].Check)</td>
+                                            <td>
+                                                @Html.DisplayFor(m => Model[i].AuthorityGroupId, new { @id = "AuthorityGroupId" + i })
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(m => Model[i].AuthorityGroupName, new { @id = "AuthorityGroupName" + i })
+                                            </td>
+                                            @Html.HiddenFor(m => Model[i].AuthorityGroupId)
+                                            @Html.HiddenFor(m => Model[i].AuthorityGroupName)
+                                        </tr>
+                                        i++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 }
+

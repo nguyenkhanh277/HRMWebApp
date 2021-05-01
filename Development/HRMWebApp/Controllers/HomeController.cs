@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace HRMWebApp.Controllers
@@ -63,14 +64,26 @@ namespace HRMWebApp.Controllers
                     itemList.Add(new SelectListItem { Selected = false, Text = string.Format("<span class='custom-select-item'>{0}</span>", "Tất cả"), Value = "ALL" });
                 }
                 DataTable dtb = new DataTable();
-                if (userInfo.Username == "administrator")
+                if (userInfo.Roles.Contains("Admin") || userInfo.Roles.Contains("UploadPayrolls"))
                 {
-                    dtb = SqlConnect.GetData("SELECT Username, EmployeeName + ' (' + Username + ')' AS EmployeeName FROM Users WHERE Username != '" + userInfo.Username + "' ORDER BY EmployeeName");
+                    dtb = SqlConnect.GetData("SELECT Username, EmployeeName + ' (' + Username + ')' AS EmployeeName FROM Users ORDER BY EmployeeName");
                 }
                 else
                 {
                     dtb = SqlConnect.GetData("SELECT Username, EmployeeName + ' (' + Username + ')' AS EmployeeName FROM Users WHERE Username = '" + userInfo.Username + "' ORDER BY EmployeeName");
                 }
+
+                //if (userInfo.Username == "administrator")
+                //{
+                //    dtb = SqlConnect.GetData("SELECT Username, EmployeeName + ' (' + Username + ')' AS EmployeeName FROM Users WHERE Username != '" + userInfo.Username + "' ORDER BY EmployeeName");
+                //}
+                //else
+                //{
+                //    dtb = SqlConnect.GetData("SELECT Username, EmployeeName + ' (' + Username + ')' AS EmployeeName FROM Users WHERE Username = '" + userInfo.Username + "' ORDER BY EmployeeName");
+                //}
+
+
+
                 for (int i = 0; i < dtb.Rows.Count; i++)
                 {
                     itemList.Add(new SelectListItem { Selected = false, Text = string.Format("<span class='custom-select-item'>{0}</span>", dtb.Rows[i]["EmployeeName"].ToString()), Value = dtb.Rows[i]["Username"].ToString() });
@@ -102,6 +115,7 @@ namespace HRMWebApp.Controllers
         }
 
         [HttpPost]
+
         public ActionResult ToDoLogin()
         {
             ViewBag.Message = new ServerMessage() { Code = "", Message = "" };
@@ -128,7 +142,25 @@ namespace HRMWebApp.Controllers
                     }
                     else
                     {
-                        InfoLogin _infoLogin = new InfoLogin() { Username = dtb.Rows[0]["Username"].ToString(), CompanyID = dtb.Rows[0]["CompanyID"].ToString(), EmployeeName = dtb.Rows[0]["EmployeeName"].ToString(), LoginTime = DateTime.Now };
+                        DataTable dtbRoles = SqlConnect.GetData("SELECT AuthorityGroupId FROM UserAuthorities WHERE UPPER(Username) = UPPER(N'" + username + "')");
+                        string[] roles = new string[dtbRoles.Rows.Count];
+                        if (dtbRoles.Rows.Count > 0)
+                        {
+                            for (int i = 0; i < dtbRoles.Rows.Count; i++)
+                            {
+                                roles[i] = dtbRoles.Rows[i]["AuthorityGroupId"].ToString().Trim();
+                            }
+                        }
+
+                        InfoLogin _infoLogin = new InfoLogin()
+                        {
+                            Username = dtb.Rows[0]["Username"].ToString(),
+                            CompanyID = dtb.Rows[0]["CompanyID"].ToString(),
+                            EmployeeName = dtb.Rows[0]["EmployeeName"].ToString(),
+                            LoginTime = DateTime.Now,
+                            Roles = roles
+                        };
+
                         Session[GlobalConstants.SESSION_KEY_USER] = _infoLogin;
                         return RedirectToAction("Index");
                     }
@@ -140,5 +172,43 @@ namespace HRMWebApp.Controllers
             }
             return View("Login");
         }
+        //public ActionResult ToDoLogin()
+        //{
+        //    ViewBag.Message = new ServerMessage() { Code = "", Message = "" };
+        //    string username = Request.Form["txtUsername"].ToString();
+        //    string password = Request.Form["txtPassword"].ToString();
+        //    if (String.IsNullOrEmpty(username))
+        //    {
+        //        ViewBag.Message = new ServerMessage() { Code = "text-warning", Message = "Chưa điền tài khoản." };
+        //    }
+        //    else if (String.IsNullOrEmpty(password))
+        //    {
+        //        ViewBag.Message = new ServerMessage() { Code = "text-warning", Message = "Chưa điền mật khẩu." };
+        //    }
+        //    else
+        //    {
+        //        DataTable dtb = SqlConnect.GetData("SELECT Username, CompanyID, EmployeeName, Password, Salt FROM Users WHERE UPPER(Username) = UPPER(N'" + username + "')");
+
+        //        if (dtb.Rows.Count > 0)
+        //        {
+        //            String encryptedPassword = SecurityHelper.GenerateMD5(password, dtb.Rows[0]["Salt"].ToString());
+        //            if (dtb.Rows[0]["Password"].ToString() != encryptedPassword)
+        //            {
+        //                ViewBag.Message = new ServerMessage() { Code = "text-warning", Message = "Mật khẩu không đúng." };
+        //            }
+        //            else
+        //            {
+        //                InfoLogin _infoLogin = new InfoLogin() { Username = dtb.Rows[0]["Username"].ToString(), CompanyID = dtb.Rows[0]["CompanyID"].ToString(), EmployeeName = dtb.Rows[0]["EmployeeName"].ToString(), LoginTime = DateTime.Now };
+        //                Session[GlobalConstants.SESSION_KEY_USER] = _infoLogin;
+        //                return RedirectToAction("Index");
+        //            }
+        //        }
+        //        else
+        //        {
+        //            ViewBag.Message = new ServerMessage() { Code = "text-warning", Message = "Tài khoản hoặc mật khẩu không chính xác." };
+        //        }
+        //    }
+        //    return View("Login");
+        //}
     }
 }

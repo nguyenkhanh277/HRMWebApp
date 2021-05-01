@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
@@ -39,6 +40,8 @@ namespace HRMWebApp.Controllers
                 startDate = dtb.Rows[0]["StartDate"].ToString();
                 typeOfContact = dtb.Rows[0]["TypeOfContact"].ToString();
             }
+            List<UserAuthorities> userAuthorities = new List<UserAuthorities>();
+            userAuthorities = LoadAuthorities(username);
             ViewBag.username = username;
             ViewBag.employeeCode = employeeCode;
             ViewBag.employeeName = employeeName;
@@ -47,17 +50,20 @@ namespace HRMWebApp.Controllers
             ViewBag.department = department;
             ViewBag.startDate = startDate;
             ViewBag.typeOfContact = typeOfContact;
-            return PartialView("UsersAddEdit");
+            return PartialView("UsersAddEdit", userAuthorities);
         }
 
         [UserAuthenticationFilter(AllUser: true), HttpPost]
-        public JsonResult UsersAddEdit()
+        public JsonResult UsersAddEdit(List<UserAuthorities> userAuthorities)
         {
+            userAuthorities = userAuthorities.Where(w => w.Check == true).ToList();
+
             bool status = false;
             string message = "Cập nhật thất bại.";
             try
             {
                 InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
+                string action = Request.Form["Action"].ToString();
                 string username = Request.Form["Username"].ToString();
                 string employeeCode = Request.Form["EmployeeCode"].ToString();
                 string employeeName = Request.Form["EmployeeName"].ToString();
@@ -66,48 +72,102 @@ namespace HRMWebApp.Controllers
                 string department = Request.Form["Department"].ToString();
                 string startDate = Request.Form["StartDate"].ToString();
                 string typeOfContact = Request.Form["TypeOfContact"].ToString();
+
                 if (String.IsNullOrEmpty(username))
                     message = "Chưa điền tài khoản";
                 else if (String.IsNullOrEmpty(employeeCode))
                     message = "Chưa điền mã nhân viên";
                 else if (String.IsNullOrEmpty(employeeName))
                     message = "Chưa điền tên nhân viên";
+                else if (String.IsNullOrEmpty(personalTaxCode))
+                    message = "Chưa điền mã số thuế cá nhân";
                 else
                 {
-                    DataTable dtb = SqlConnect.GetData("SELECT Username FROM Users WHERE Username = N'" + username + "'");
-                    if (dtb.Rows.Count > 0)
+                    DataTable dtbCheckUsername = SqlConnect.GetData("SELECT Username FROM Users WHERE Username = N'" + username + "'");
+                    if (dtbCheckUsername.Rows.Count > 0 &&
+                        (
+                            action == "ADD" ||
+                            (action == "EDIT" && username != dtbCheckUsername.Rows[0][0].ToString())
+                        ))
                     {
-                        string query = SqlConnect.UpdateToTableString(
-                            "Users",
-                            new string[] { "EmployeeCode", "EmployeeName", "PersonalTaxCode", "Position", "Department", "StartDate", "TypeOfContact" },
-                            new object[] { employeeCode, employeeName, personalTaxCode, position, department, startDate, typeOfContact },
-                            "Username = N'" + username + "'");
-                        SqlConnect.ExecuteQueryUsingTran(query);
-                        if (!SqlConnect.Error)
-                        {
-                            status = true;
-                            message = "Thành công.";
-                        }
+                        message = "Tài khoản này đã tồn tại";
                     }
                     else
                     {
-                        if (String.IsNullOrEmpty(username))
-                            message = "Chưa điền tài khoản";
+                        DataTable dtbPersionalTaxCode = SqlConnect.GetData("SELECT PersonalTaxCode FROM Users WHERE PersonalTaxCode = N'" + personalTaxCode + "'");
+                        if (dtbPersionalTaxCode.Rows.Count > 0 &&
+                            (
+                                action == "ADD" ||
+                                (action == "EDIT" && personalTaxCode != dtbPersionalTaxCode.Rows[0][0].ToString())
+                            ))
+                        {
+                            message = "Mã số thuế cá nhân này đã tồn tại";
+                        }
                         else
                         {
-                            string salt = SecurityHelper.CreateSalt(GlobalConstants.DEFAULT_SALT_LENGTH);
-                            string rawPassword = Request.Form["Password"].ToString();
-                            string password = SecurityHelper.GenerateMD5(rawPassword, salt);
-                            string query = SqlConnect.InsertToTableString(
-                                "Users",
-                                new string[] { "Username", "CompanyID", "Salt", "Password", "EmployeeCode", "EmployeeName", "PersonalTaxCode", "Position", "Department", "StartDate", "TypeOfContact", "Status", "CreatedAt", "CreatedBy" },
-                                new object[] { username, userInfo.CompanyID, salt, password, employeeCode, employeeName, personalTaxCode, position, department, startDate, typeOfContact, 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), userInfo.Username });
-
-                            SqlConnect.ExecuteQueryUsingTran(query);
-                            if (!SqlConnect.Error)
+                            if (action == "EDIT")
                             {
-                                status = true;
-                                message = "Thành công.";
+                                string query = SqlConnect.UpdateToTableString(
+                                    "Users",
+                                    new string[] { "EmployeeCode", "EmployeeName", "PersonalTaxCode", "Position", "Department", "StartDate", "TypeOfContact" },
+                                    new object[] { employeeCode, employeeName, personalTaxCode, position, department, startDate, typeOfContact },
+                                    "Username = N'" + username + "'");
+
+                                query += SqlConnect.DeleteFromTableString(
+                                                           "UserAuthorities",
+                                                           " Username = N'" + username + "'"
+                                                       );
+
+                                foreach (var item in userAuthorities)
+                                {
+                                    query += SqlConnect.InsertToTableString(
+                                            "UserAuthorities",
+                                            new string[] { "Username", "AuthorityGroupId", "CreatedAt", "CreatedBy" },
+                                            new object[] { username, item.AuthorityGroupId, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), userInfo.Username });
+                                }
+
+
+                                SqlConnect.ExecuteQueryUsingTran(query);
+                                if (!SqlConnect.Error)
+                                {
+                                    status = true;
+                                    message = "Thành công.";
+                                }
+                            }
+                            else
+                            {
+                                string salt = SecurityHelper.CreateSalt(GlobalConstants.DEFAULT_SALT_LENGTH);
+                                string rawPassword = Request.Form["Password"].ToString();// == string.Empty ? Request.Form["Username"].ToString() : Request.Form["Password"].ToString();
+                                if (String.IsNullOrEmpty(rawPassword))
+                                    message = "Chưa điền mật khẩu";
+                                else
+                                {
+                                    string password = SecurityHelper.GenerateMD5(rawPassword, salt);
+                                    string query = SqlConnect.InsertToTableString(
+                                        "Users",
+                                        new string[] { "Username", "CompanyID", "Salt", "Password", "EmployeeCode", "EmployeeName", "PersonalTaxCode", "Position", "Department", "StartDate", "TypeOfContact", "Status", "CreatedAt", "CreatedBy" },
+                                        new object[] { username, userInfo.CompanyID, salt, password, employeeCode, employeeName, personalTaxCode, position, department, startDate, typeOfContact, 1, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), userInfo.Username });
+
+                                    query += SqlConnect.DeleteFromTableString(
+                                                           "UserAuthorities",
+                                                           " Username = N'" + username + "'"
+                                                       );
+
+                                    foreach (var item in userAuthorities)
+                                    {
+                                        query += SqlConnect.InsertToTableString(
+                                                "UserAuthorities",
+                                                new string[] { "Username", "AuthorityGroupId", "CreatedAt", "CreatedBy" },
+                                                new object[] { username, item.AuthorityGroupId, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), userInfo.Username });
+                                    }
+
+                                    SqlConnect.ExecuteQueryUsingTran(query);
+                                    if (!SqlConnect.Error)
+                                    {
+                                        status = true;
+                                        message = "Thành công.";
+                                    }
+                                }
                             }
                         }
                     }
@@ -131,18 +191,31 @@ namespace HRMWebApp.Controllers
             string message = "Xóa thất bại";
             try
             {
-                if (!String.IsNullOrEmpty(username))
+                InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
+                if (userInfo.Username.ToUpper().Equals("ADMINISTRATOR") || userInfo.Username.ToUpper().Equals("ADMIN") || userInfo.Roles.Contains("CreateUser"))
                 {
-                    string query = SqlConnect.DeleteFromTableString(
-                                        "Users",
-                                        " Username = N'" + username + "'"
-                                    );
-                    SqlConnect.ExecuteQueryUsingTran(query);
-                    if (!SqlConnect.Error)
+                    if (!String.IsNullOrEmpty(username))
                     {
-                        status = true;
-                        message = "Thành công.";
+                        string query = SqlConnect.DeleteFromTableString(
+                                            "Users",
+                                            " Username = N'" + username + "'"
+                                        );
+                        query += SqlConnect.DeleteFromTableString(
+                                                       "UserAuthorities",
+                                                       " Username = N'" + username + "'"
+                                                   );
+
+                        SqlConnect.ExecuteQueryUsingTran(query);
+                        if (!SqlConnect.Error)
+                        {
+                            status = true;
+                            message = "Thành công.";
+                        }
                     }
+                }
+                else
+                {
+                    message = "Tài khoản này không có quyền xóa.";
                 }
             }
             catch { }
@@ -159,13 +232,13 @@ namespace HRMWebApp.Controllers
         public ActionResult UsersList(string companyID)
         {
             InfoLogin userInfo = InfoLogin.GetCurrentUser(System.Web.HttpContext.Current);
-            DataTable dtb = SqlConnect.GetData("SELECT Username, EmployeeCode, EmployeeName, PersonalTaxCode, Position, Department, StartDate, TypeOfContact FROM Users WHERE Username != 'administrator' AND CompanyID = '" + userInfo.CompanyID + "'");
+            DataTable dtb = SqlConnect.GetData("SELECT Username, EmployeeCode, EmployeeName, PersonalTaxCode, Position, Department, StartDate, TypeOfContact FROM Users WHERE Username NOT IN ('administrator', 'admin') AND CompanyID = '" + userInfo.CompanyID + "'");
             List<string[]> lResult = new List<string[]>();
             for (int i = 0; i < dtb.Rows.Count; i++)
             {
                 lResult.Add(new string[] {
-                    "<div><button type='button' class='btn btn-danger btn-remove' onclick=\"remove('" + dtb.Rows[i]["Username"].ToString() + "')\"><i class='fa fa-remove'></i></div>",
-                    "<div><button type='button' class='btn btn-success btn-edit' onclick=\"showForm('" + dtb.Rows[i]["Username"].ToString() + "')\"><i class='fa fa-edit'></i></div>",
+                    (userInfo.Username.ToUpper().Equals("ADMINISTRATOR") || userInfo.Username.ToUpper().Equals("ADMIN") || userInfo.Roles.Contains("CreateUser") ? "<div><button type='button' class='btn btn-danger btn-remove' onclick=\"remove('" + dtb.Rows[i]["Username"].ToString() + "')\"><i class='fa fa-remove'></i></div>" : ""),
+                    (userInfo.Username.ToUpper().Equals("ADMINISTRATOR") || userInfo.Username.ToUpper().Equals("ADMIN") || userInfo.Roles.Contains("CreateUser") ? "<div><button type='button' class='btn btn-success btn-edit' onclick=\"showForm('" + dtb.Rows[i]["Username"].ToString() + "')\"><i class='fa fa-edit'></i></div>" : ""),
                     (i + 1).ToString(),
                     dtb.Rows[i]["Username"].ToString(),
                     dtb.Rows[i]["EmployeeCode"].ToString(),
@@ -250,6 +323,34 @@ namespace HRMWebApp.Controllers
                 ContentEncoding = System.Text.Encoding.UTF8,
                 MaxJsonLength = Int32.MaxValue
             };
+        }
+
+        private List<UserAuthorities> LoadAuthorities(string username)
+        {
+            List<UserAuthorities> listUserAuthorities = new List<UserAuthorities>();
+            DataTable dtbAuthorityGroups = SqlConnect.GetData("SELECT Id, AuthorityGroupName FROM AuthorityGroups");
+            DataTable dtbUserAuthorities = SqlConnect.GetData("SELECT AuthorityGroupId FROM UserAuthorities WHERE Username = N'" + username + "'");
+
+            foreach (DataRow drGroup in dtbAuthorityGroups.Rows)
+            {
+                bool check = false;
+                foreach (DataRow drUser in dtbUserAuthorities.Rows)
+                {
+                    if (drGroup["Id"].ToString() == drUser["AuthorityGroupId"].ToString())
+                    {
+                        check = true;
+                        break;
+                    }
+                }
+                listUserAuthorities.Add(new UserAuthorities
+                {
+                    AuthorityGroupId = drGroup["Id"].ToString(),
+                    AuthorityGroupName = drGroup["AuthorityGroupName"].ToString(),
+                    Check = check
+                });
+            }
+            return listUserAuthorities;
+
         }
     }
 }

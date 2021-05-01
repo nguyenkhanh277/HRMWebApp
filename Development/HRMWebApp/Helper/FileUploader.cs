@@ -67,7 +67,7 @@ namespace HRMWebApp.Helper
             {
                 // you might NOT want to show the exception error for the user
                 // this is generaly logging or testing
-
+                GlobalConstants._log.Error(ex.ToString());
                 fileResult.Success = false;
                 fileResult.ErrorMessage = ex.Message;
                 return fileResult;
@@ -112,11 +112,11 @@ namespace HRMWebApp.Helper
                 string conStr = "";
                 if (fileExt.ToUpper() == ".XLS" || fileExt.ToUpper() == "XLS")
                 {
-                    conStr = "Provider=Microsoft.Jet.OLEDB.4.0; Data Source='" + filePath + "'" + "; Extended Properties ='Excel 8.0;HDR=Yes'";
+                    conStr = "Provider=Microsoft.Jet.OLEDB.4.0; Data Source='" + filePath + "'; Extended Properties ='Excel 8.0;HDR=Yes'";
                 }
                 else if (fileExt.ToUpper() == ".XLSX" || fileExt.ToUpper() == "XLSX")
                 {
-                    conStr = "Provider=Microsoft.ACE.OLEDB.12.0; Data Source=" + filePath + "; Extended Properties ='Excel 8.0;HDR=Yes'";
+                    conStr = "Provider=Microsoft.ACE.OLEDB.12.0; Data Source='" + filePath + "'; Extended Properties ='Excel 12.0;HDR=Yes'";
                 }
                 conStr = string.Format(conStr, filePath);
                 OleDbConnection cn = new OleDbConnection();
@@ -129,7 +129,7 @@ namespace HRMWebApp.Helper
             }
             catch (Exception ex)
             {
-                string s = ex.ToString();
+                GlobalConstants._log.Error(ex.ToString());
             }
             return tbl;
         }

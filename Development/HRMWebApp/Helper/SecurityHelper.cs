@@ -33,6 +33,23 @@ namespace HRMWebApp.Helper
             byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
             return Convert.ToBase64String(resultArray, 0, resultArray.Length);
         }
+
+        public static List<string> MD5_Encrypt(List<string> value)
+        {
+            List<string> encryptDataArray = new List<string>();
+            string md5Data;
+            for (int i = 0; i < value.Count; i++)
+            {
+                try
+                {
+                    md5Data = MD5_Encrypt(value[i]);
+                }
+                catch 
+                { md5Data = "0"; }
+                encryptDataArray.Add(md5Data);
+            }
+            return encryptDataArray;
+        }
         /// <summary>
         /// Giải mã dữ liệu đã mã hóa
         /// </summary>
@@ -54,6 +71,23 @@ namespace HRMWebApp.Helper
             ICryptoTransform cTransform = tdes.CreateDecryptor();
             byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
             return UTF8Encoding.UTF8.GetString(resultArray);
+        }
+
+        public static List<string> MD5_Decrypt(List<string> value)
+        {
+            List<string> decryptDataArray = new List<string>();
+            string md5Data;
+            for (int i = 0; i < value.Count; i++)
+            {
+                try
+                {
+                    md5Data = MD5_Decrypt(value[i]);
+                }
+                catch
+                { md5Data = "0"; }
+                decryptDataArray.Add(md5Data);
+            }
+            return decryptDataArray;
         }
         #endregion
 
